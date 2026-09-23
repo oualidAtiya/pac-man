@@ -1,27 +1,14 @@
 from argparse import ArgumentParser, ArgumentTypeError
 import re
-from pydantic import ValidationError
-from src.config.models import Data, GameConfig
+from typing import Any
+from src.config.models import GameConfig
+from src.config.logger import logger
 import json
 
 class Loader:
 
     def __init__(self) -> None:
         self.file_name = Loader.parse_file_name()
-        self.config = {
-            "lives": 3,
-            "seed": 42,
-            "level_max_time": 90,
-            "points_per_pacgum": 10,
-            "points_per_super_pacgum": 50,
-            "points_per_ghost": 200,
-            "highscore_filename": "highscores.json",
-            "levels": [
-                {"width": 10, "height": 21},
-                {"width": 25, "height": 25},
-                {"width": 31, "height": 31}
-            ]
-        }
 
     @staticmethod
     def json_type(value: str) -> str:
@@ -49,47 +36,40 @@ class Loader:
                 striped_content += line.split('#')[0]
         return "".join(striped_content)
 
-    @staticmethod
-    def format_errors(errs: dict) -> None:
-        for i, err in enumerate(errs, 1):
-            if (len(err.get('loc')) > 1):
-                keys = err.get("loc")
-                if (len(keys) == 2):
-                    key = err.get("loc")[-1]
-                elif (len(keys) == 4):
-                    key = ".".join([keys[1], keys[-1]])
 
-                print(f"\033[1;33mWarning #{i} at field ({key}):\033[0m", end=" ")
-            if (err.get('msg', False)):
-                print(f"\033[1;32m{err.get('msg')}\033[0m")
+    def check_duplicate(pairs: tuple[Any, Any]) -> dict:
+        seen = set()
+        duplicated = []
+        for key, _ in pairs:
+            if key in seen:
+                duplicated.append(key)
+                continue
+            seen.add(key)
+        if duplicated:
+            logger.warning(f"duplicated keys: {duplicated}")
+        return dict(pairs)
+
 
     def load_config(self) -> GameConfig | None:
-        config_error = False
         try:
             content = self.read_config_file()
         except PermissionError:
-            print(f"\033[1;31m'{self.file_name}': File Don't Have Permission:\033[0m")
-            return
+            logger.warning(f"'{self.file_name}' file don't have permission default config will be used")
+            return GameConfig.model_validate(None)
         except FileNotFoundError:
-            print(f"\033[1;31m'{self.file_name}': File Not Found\033[0m")
-            return
+            logger.warning(f"'{self.file_name}' file not found default config will be used")
+            return GameConfig.model_validate(None)
 
         striped_content = Loader.strip_comments(content)
+        if not striped_content:
+            logger.warning("file is empty default config will be used")
+            return GameConfig.model_validate(None)
         try:
-            data = json.loads(striped_content)
+            data = json.loads(striped_content, object_pairs_hook=Loader.check_duplicate)
         except json.JSONDecodeError as err:
             error_line = err.doc.split('\n')[err.lineno-1]
-            msg = (
-                f"\033[91;1mJson Error: >>>\033[0m{error_line}\033[91;1m<<<\033[0m"
-            )
-            print(msg)
+            logger.json_error(error_line)
             return
 
-        try:
-            config = Data(data=data).data
-        except ValidationError as errs:
-            Loader.format_errors(json.loads(errs.json()))
-            config_error = True
-        if config_error:
-            config = GameConfig(**self.config)
+        config = GameConfig.model_validate(data)
         return config

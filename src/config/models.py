@@ -1,27 +1,44 @@
-from pydantic import BaseModel, Field, StringConstraints, ConfigDict
-from typing import Annotated
+from pydantic import (BaseModel, model_validator)
+from typing import Any
+from src.config.logger import logger
+import re
 
-type_int = Annotated[int, Field(gt=0)]
-
-
-class Level(BaseModel):
-    width: type_int
-    height: type_int
-
-    model_config = ConfigDict(extra='forbid', strict=True)
-    
 
 class GameConfig(BaseModel):
-    lives: type_int
-    seed: type_int
-    level_max_time: type_int
-    points_per_pacgum: type_int
-    points_per_super_pacgum: type_int
-    points_per_ghost: type_int
-    highscore_filename: Annotated[str, StringConstraints(pattern=r"\S+\.json")]
-    levels: Annotated[list[Level], Field(min_length=1)]
+    lives: int = 10
+    seed: int = 10
+    level_max_time: int = 10
+    points_per_pacgum: int = 10
+    points_per_super_pacgum: int = 10
+    points_per_ghost: int = 10
+    highscore_filename: str = 'highscores.json'
 
-    model_config = ConfigDict(extra='forbid', strict=True)
+    @model_validator(mode="before")
+    @classmethod
+    def validate_fields(cls, data: Any):
+        if (data is None):
+            return {}
+        if (not isinstance(data, dict)):
+            logger.warning("config file should be dict default config will be used")
+            return {}
 
-class Data(BaseModel):
-    data: GameConfig
+        data_copy = data.copy()
+        required_fields = cls.model_fields
+        missing_keys = set(required_fields.keys()).difference(data.keys())
+        for key, value in data.items():
+            if key not in required_fields.keys():
+                logger.warning(f"unknown key `{key}` will be ignored")
+                continue
+
+            default = required_fields[key].default
+            if key != 'highscore_filename' and (not isinstance(value, int) or value <= 0):
+                logger.warning(f"`{key}` should be positive int will be replaced by {default}")
+                data_copy[key] = default
+                continue
+            if key == 'highscore_filename':
+                if not isinstance(value, str) or not re.search(r"^\S+\.json$", value):
+                    logger.warning(f"`{value}` should be valid json file will replaced by `{default}`")
+                    data_copy[key] = default
+        if missing_keys:
+            logger.warning(f"missing keys: {missing_keys}")
+        return data_copy

@@ -8,6 +8,9 @@ class Level(BaseModel):
     width: type_int
     height: type_int
 
+    model_config = ConfigDict(extra='forbid', strict=True)
+    
+
 class GameConfig(BaseModel):
     lives: type_int
     seed: type_int
@@ -17,6 +20,8 @@ class GameConfig(BaseModel):
     points_per_ghost: type_int
     highscore_filename: Annotated[str, StringConstraints(pattern=r"\S+\.json")]
     levels: Annotated[list[Level], Field(min_length=1)]
+
+    model_config = ConfigDict(extra='forbid', strict=True)
 
 class Data(BaseModel):
     data: GameConfig

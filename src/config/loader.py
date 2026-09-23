@@ -6,8 +6,22 @@ import json
 
 class Loader:
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.file_name = Loader.parse_file_name()
+        self.config = {
+            "lives": 3,
+            "seed": 42,
+            "level_max_time": 90,
+            "points_per_pacgum": 10,
+            "points_per_super_pacgum": 50,
+            "points_per_ghost": 200,
+            "highscore_filename": "highscores.json",
+            "levels": [
+                {"width": 10, "height": 21},
+                {"width": 25, "height": 25},
+                {"width": 31, "height": 31}
+            ]
+        }
 
     @staticmethod
     def json_type(value: str) -> str:
@@ -24,13 +38,8 @@ class Loader:
         return args.file_name
 
     def read_config_file(self) -> list[int]:
-        try:
-            with open(self.file_name) as config:
-                return config.readlines()
-        except PermissionError:
-            pass
-        except FileNotFoundError:
-            pass
+        with open(self.file_name) as config:
+            return config.readlines()
 
     @staticmethod
     def strip_comments(content: list[str]) -> str:
@@ -45,48 +54,42 @@ class Loader:
         for i, err in enumerate(errs, 1):
             if (len(err.get('loc')) > 1):
                 keys = err.get("loc")
-                index = keys[1]
-                key = ".".join([str(key) for key in keys[2:]])
-                print(
-                    f"\033[1;91mError #{i} at field `data[{index}].{key}`:\033[0m")
+                if (len(keys) == 2):
+                    key = err.get("loc")[-1]
+                elif (len(keys) == 4):
+                    key = ".".join([keys[1], keys[-1]])
+
+                print(f"\033[1;33mWarning #{i} at field ({key}):\033[0m", end=" ")
             if (err.get('msg', False)):
-                print(f"\033[1;96mMessage: {err.get('msg')}\033[0m")
-            if (err.get('type', False)):
-                print(f"\033[1;92mError Type: {err.get('type')}\033[0m")
+                print(f"\033[1;32m{err.get('msg')}\033[0m")
 
     def load_config(self) -> GameConfig | None:
-        content = self.read_config_file()
+        config_error = False
+        try:
+            content = self.read_config_file()
+        except PermissionError:
+            print(f"\033[1;31m'{self.file_name}': File Don't Have Permission:\033[0m")
+            return
+        except FileNotFoundError:
+            print(f"\033[1;31m'{self.file_name}': File Not Found\033[0m")
+            return
+
         striped_content = Loader.strip_comments(content)
         try:
             data = json.loads(striped_content)
         except json.JSONDecodeError as err:
             error_line = err.doc.split('\n')[err.lineno-1]
             msg = (
-                f"\033[92m Error: >>>\033[0m{error_line}\033[92m<<<\033[0m"
+                f"\033[91;1mJson Error: >>>\033[0m{error_line}\033[91;1m<<<\033[0m"
             )
             print(msg)
             return
 
-        config_error = False
         try:
             config = Data(data=data).data
         except ValidationError as errs:
             Loader.format_errors(json.loads(errs.json()))
             config_error = True
         if config_error:
-            default = {
-                "lives": 3,
-                "seed": 42,
-                "level_max_time": 90,
-                "points_per_pacgum": 10,
-                "points_per_super_pacgum": 50,
-                "points_per_ghost": 200,
-                "highscore_filename": "highscores.json",
-                "levels": [
-                    {"width": 10, "height": 21},
-                    {"width": 25, "height": 25},
-                    {"width": 31, "height": 31}
-                ]
-            }
-            config = GameConfig(**default)
+            config = GameConfig(**self.config)
         return config

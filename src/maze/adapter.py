@@ -12,11 +12,7 @@ class MazeAdapter:
         self.seed = config.seed
 
     def generate_cell(self, cell_value: int) -> Cell:
-        north = (cell_value & 1) != 0
-        east = (cell_value & 2) != 0
-        south = (cell_value & 4) != 0
-        west = (cell_value & 8) != 0
-        return Cell(north, east, west, south)
+        return Cell(cell_value)
 
     def generate_maze(self) -> list[list[Cell]]:
         maze = MazeGenerator(size=(self.width, self.height), seed=self.seed).maze

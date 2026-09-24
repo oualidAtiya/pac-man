@@ -5,6 +5,8 @@ import re
 
 
 class GameConfig(BaseModel):
+    width: int = 15
+    height: int = 15
     lives: int = 10
     seed: int = 10
     level_max_time: int = 10

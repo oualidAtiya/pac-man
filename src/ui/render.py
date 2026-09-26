@@ -91,12 +91,14 @@ class Renderer:
         self._screen.fill((39, 39, 54))
         if state.screen == Screen.MENU:
             self._draw_menu()
-        # if state.screen == Screen.PLAYING:
-        #     # TODO draw the maze
-        #     ...
+        if state.screen == Screen.PLAYING:
+            self._draw_gameplay(state)
         if state.screen == Screen.EXIT:
             self._running = False
         pygame.display.flip()
+
+    def _draw_gameplay(self, state: GameState) -> None:
+        state.maze.draw(self._screen)
 
     def _draw_menu(self) -> None:
         self._draw_title()

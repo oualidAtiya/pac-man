@@ -13,7 +13,7 @@ def main():
         maze = Maze(config)
         state = GameState(
             maze=maze,
-            player=Player((0, 0), 0),
+            player=Player((0, 0), config.lives),
             ghosts=[
                 Ghost((0, 0), "red"),
                 Ghost((0, 0), "blue"),

@@ -2,9 +2,10 @@
 
 import pygame
 
+from src.game.direction import Direction
 from src.game.state import GameState, Screen
 from src.ui.button import Button
-from src.game.direction import Direction
+
 
 class Renderer:
     """Owns the game window and drives the main event loop."""
@@ -20,7 +21,6 @@ class Renderer:
         pygame.display.set_caption(title)
         self._running = False
         self._menu_buttons = self._build_menu_buttons()
-        self._pending_button = None
 
     def _build_menu_buttons(self) -> dict[str, Button]:
         """Create and position the main menu's buttons, keyed by action name."""
@@ -51,10 +51,6 @@ class Renderer:
             self._handle_events(state)
             self._draw(state)
 
-            if self._pending_button is not None:
-                self._pending_button.on_button_pressed(state)
-                self._pending_button = None
-
             clock.tick(60)
 
         self._shutdown()
@@ -68,40 +64,45 @@ class Renderer:
             elif event.type == pygame.KEYDOWN:
                 self._handle_keydown(event.key, state)
 
-            elif event.type == pygame.MOUSEMOTION:
-                for button in self._menu_buttons.values():
-                    button.handle_mouse_motion(event.pos)
+            if state.screen == Screen.MENU:
+                if event.type == pygame.MOUSEMOTION:
+                    for button in self._menu_buttons.values():
+                        button.handle_mouse_motion(event.pos)
 
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                for button in self._menu_buttons.values():
-                    if button.handle_mouse_down(event.pos):
-                        self._pending_button = button
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    for button in self._menu_buttons.values():
+                        button.handle_mouse_down(event.pos)
 
-            elif event.type == pygame.MOUSEBUTTONUP:
-                for button in self._menu_buttons.values():
-                    button.handle_mouse_up(event.pos)
+                elif event.type == pygame.MOUSEBUTTONUP:
+                    for button in self._menu_buttons.values():
+                        button.handle_mouse_up(state)
 
     def _handle_keydown(self, key: int, state: GameState) -> None:
         """Handle a single keypress. Extend this as gameplay is added."""
         if key == pygame.K_ESCAPE:
-            self._running = False
-        if key == pygame.K_DOWN:
-            state.player.try_move(Direction.SOUTH)
-        if key == pygame.K_UP:
-            state.player.try_move(Direction.NORTH)
-        if key == pygame.K_RIGHT:
-            state.player.try_move(Direction.EAST)
-        if key == pygame.K_LEFT:
-            state.player.try_move(Direction.WEST)
+            if state.screen == Screen.MENU:
+                self._running = False
+            elif state.screen != Screen.MENU:
+                state.screen = Screen.MENU
+
+        if state.screen == Screen.PLAYING:
+            if key == pygame.K_DOWN:
+                state.player.try_move(Direction.SOUTH)
+            if key == pygame.K_UP:
+                state.player.try_move(Direction.NORTH)
+            if key == pygame.K_RIGHT:
+                state.player.try_move(Direction.EAST)
+            if key == pygame.K_LEFT:
+                state.player.try_move(Direction.WEST)
 
     def _draw(self, state: GameState) -> None:
         """Render exactly one frame based on the current game state."""
         self._screen.fill((39, 39, 54))
         if state.screen == Screen.MENU:
             self._draw_menu()
-        if state.screen == Screen.PLAYING:
+        elif state.screen == Screen.PLAYING:
             self._draw_gameplay(state)
-        if state.screen == Screen.EXIT:
+        elif state.screen == Screen.EXIT:
             self._running = False
         pygame.display.flip()
 

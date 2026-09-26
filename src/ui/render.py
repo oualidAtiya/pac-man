@@ -53,6 +53,7 @@ class Renderer:
 
             if self._pending_button is not None:
                 self._pending_button.on_button_pressed(state)
+                self._pending_button.reset_state()
                 self._pending_button = None
 
             clock.tick(60)
@@ -68,23 +69,27 @@ class Renderer:
             elif event.type == pygame.KEYDOWN:
                 self._handle_keydown(event.key, state)
 
-            elif event.type == pygame.MOUSEMOTION:
-                for button in self._menu_buttons.values():
-                    button.handle_mouse_motion(event.pos)
+            if state.screen == Screen.MENU:
+                if event.type == pygame.MOUSEMOTION:
+                    for button in self._menu_buttons.values():
+                        button.handle_mouse_motion(event.pos)
 
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                for button in self._menu_buttons.values():
-                    if button.handle_mouse_down(event.pos):
-                        self._pending_button = button
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    for button in self._menu_buttons.values():
+                        if button.handle_mouse_down(event.pos):
+                            self._pending_button = button
 
-            elif event.type == pygame.MOUSEBUTTONUP:
-                for button in self._menu_buttons.values():
-                    button.handle_mouse_up(event.pos)
+                elif event.type == pygame.MOUSEBUTTONUP:
+                    for button in self._menu_buttons.values():
+                        button.handle_mouse_up(event.pos)
 
     def _handle_keydown(self, key: int, state: GameState) -> None:
         """Handle a single keypress. Extend this as gameplay is added."""
         if key == pygame.K_ESCAPE:
-            self._running = False
+            if state.screen == Screen.MENU:
+                self._running = False
+            elif state.screen == Screen.PLAYING:
+                state.screen = Screen.MENU
 
     def _draw(self, state: GameState) -> None:
         """Render exactly one frame based on the current game state."""

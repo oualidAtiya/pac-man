@@ -28,6 +28,9 @@ class Button:
         self.state = "normal"
         self.name = name
 
+    def reset_state(self) -> None:
+        self.state = "normal"
+
     def handle_mouse_motion(self, position: tuple[int, int]) -> None:
         if self.state != "pressed":
             self.state = (

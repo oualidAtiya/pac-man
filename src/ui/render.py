@@ -4,7 +4,7 @@ import pygame
 
 from src.game.state import GameState, Screen
 from src.ui.button import Button
-
+from src.game.direction import Direction
 
 class Renderer:
     """Owns the game window and drives the main event loop."""
@@ -85,6 +85,14 @@ class Renderer:
         """Handle a single keypress. Extend this as gameplay is added."""
         if key == pygame.K_ESCAPE:
             self._running = False
+        if key == pygame.K_DOWN:
+            state.player.try_move(Direction.SOUTH)
+        if key == pygame.K_UP:
+            state.player.try_move(Direction.NORTH)
+        if key == pygame.K_RIGHT:
+            state.player.try_move(Direction.EAST)
+        if key == pygame.K_LEFT:
+            state.player.try_move(Direction.WEST)
 
     def _draw(self, state: GameState) -> None:
         """Render exactly one frame based on the current game state."""
@@ -99,6 +107,7 @@ class Renderer:
 
     def _draw_gameplay(self, state: GameState) -> None:
         state.maze.draw(self._screen)
+        state.player.draw(self._screen)
 
     def _draw_menu(self) -> None:
         self._draw_title()

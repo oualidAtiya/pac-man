@@ -11,6 +11,11 @@ class Maze:
         self.config = config
         self.width = config.width
         self.height = config.height
+        self.width_maze_px = (32 * config.width + 1) + (32 * config.width)
+        self.height_maze_px = (32 * config.height + 1) + (32 * config.height)
+        self.offest_x = (2000 // 2) - (self.width * 32)
+        self.offest_y = (1500 // 2) - (self.height * 32)
+
 
     def draw(self, screen: Surface) -> None:
         corners = {
@@ -22,13 +27,9 @@ class Maze:
 
         corner_rect = corners[1].get_rect()
         cell_width = corner_rect.width
-        cell_heigh = corner_rect.height
 
-        start_x = (screen.get_width() // 2) - (self.width * cell_width)
-        start_y = (screen.get_height() // 2) - (self.height * cell_heigh)
-
-        x_px = start_x
-        y_px = start_y
+        x_px = self.offest_x
+        y_px = self.offest_y
 
         for y in range(self.height):
             for x in range(self.width):
@@ -76,4 +77,4 @@ class Maze:
                     screen.blit(corners[5], (x_px, y_px + cell_width))
                 x_px += cell_width * 2
             y_px += cell_width * 2
-            x_px = start_x
+            x_px = self.offest_x

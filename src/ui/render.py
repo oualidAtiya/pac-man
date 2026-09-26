@@ -81,7 +81,7 @@ class Renderer:
         if key == pygame.K_ESCAPE:
             if state.screen == Screen.MENU:
                 self._running = False
-            elif state.screen == Screen.PLAYING:
+            elif state.screen != Screen.MENU:
                 state.screen = Screen.MENU
 
     def _draw(self, state: GameState) -> None:
@@ -89,9 +89,9 @@ class Renderer:
         self._screen.fill((39, 39, 54))
         if state.screen == Screen.MENU:
             self._draw_menu()
-        if state.screen == Screen.PLAYING:
+        elif state.screen == Screen.PLAYING:
             self._draw_gameplay(state)
-        if state.screen == Screen.EXIT:
+        elif state.screen == Screen.EXIT:
             self._running = False
         pygame.display.flip()
 

@@ -49,8 +49,8 @@ class Renderer:
 
         while self._running:
             self._handle_events(state)
+            state.player.update_position()
             self._draw(state)
-
             clock.tick(60)
 
         self._shutdown()
@@ -87,13 +87,13 @@ class Renderer:
 
         if state.screen == Screen.PLAYING:
             if key == pygame.K_DOWN:
-                state.player.try_move(Direction.SOUTH)
+                state.player.request_move(Direction.SOUTH)
             if key == pygame.K_UP:
-                state.player.try_move(Direction.NORTH)
+                state.player.request_move(Direction.NORTH)
             if key == pygame.K_RIGHT:
-                state.player.try_move(Direction.EAST)
+                state.player.request_move(Direction.EAST)
             if key == pygame.K_LEFT:
-                state.player.try_move(Direction.WEST)
+                state.player.request_move(Direction.WEST)
 
     def _draw(self, state: GameState) -> None:
         """Render exactly one frame based on the current game state."""

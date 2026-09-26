@@ -1,29 +1,29 @@
 from src.config.loader import Loader
+from src.game.ghost import Ghost
+from src.game.player import Player
+from src.game.state import GameState
 from src.maze.maze import Maze
-import pygame
-
+from src.ui.render import Renderer
 
 
 def main():
     loader = Loader()
     config = loader.load_config()
-    if not config:
-        return
+    if config:
+        maze = Maze(config)
+        state = GameState(
+            maze=maze,
+            player=Player((0, 0), 0),
+            ghosts=[
+                Ghost((0, 0), "red"),
+                Ghost((0, 0), "blue"),
+                Ghost((0, 0), "green"),
+                Ghost((0, 0), "yellow"),
+            ],
+        )
+        render = Renderer(2000, 1500)
+        render.run(state)
 
-    pygame.init()
-    maze = Maze(config)
-    screen = pygame.display.set_mode((2000, 1500))
-    clock = pygame.time.Clock()
-    
-    is_run = True
-    while is_run:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                is_run = False
-        screen.fill((0, 0, 0))
-        maze.draw(screen, 520, 170)
-        pygame.display.flip()
-        clock.tick(60)
-    
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

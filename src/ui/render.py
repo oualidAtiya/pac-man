@@ -20,7 +20,6 @@ class Renderer:
         pygame.display.set_caption(title)
         self._running = False
         self._menu_buttons = self._build_menu_buttons()
-        self._pending_button = None
 
     def _build_menu_buttons(self) -> dict[str, Button]:
         """Create and position the main menu's buttons, keyed by action name."""
@@ -51,11 +50,6 @@ class Renderer:
             self._handle_events(state)
             self._draw(state)
 
-            if self._pending_button is not None:
-                self._pending_button.on_button_pressed(state)
-                self._pending_button.reset_state()
-                self._pending_button = None
-
             clock.tick(60)
 
         self._shutdown()
@@ -76,12 +70,11 @@ class Renderer:
 
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     for button in self._menu_buttons.values():
-                        if button.handle_mouse_down(event.pos):
-                            self._pending_button = button
+                        button.handle_mouse_down(event.pos)
 
                 elif event.type == pygame.MOUSEBUTTONUP:
                     for button in self._menu_buttons.values():
-                        button.handle_mouse_up(event.pos)
+                        button.handle_mouse_up(state)
 
     def _handle_keydown(self, key: int, state: GameState) -> None:
         """Handle a single keypress. Extend this as gameplay is added."""

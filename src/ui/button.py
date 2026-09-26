@@ -33,17 +33,18 @@ class Button:
 
     def handle_mouse_motion(self, position: tuple[int, int]) -> None:
         if self.state != "pressed":
-            self.state = (
-                "hover" if self.rect.collidepoint(position) else "normal"
-            )
+            collide = self.rect.collidepoint(position)
+            self.state = "hover" if collide else "normal"
 
-    def handle_mouse_down(self, position: tuple[int, int]) -> bool:
+    def handle_mouse_down(self, position: tuple[int, int]) -> None:
         if self.rect.collidepoint(position):
             self.state = "pressed"
-            return True
-        return False
 
-    def on_button_pressed(self, state: GameState) -> None:
+    def handle_mouse_up(self, state: GameState) -> None:
+        if self.state != "pressed":
+            return
+
+        self.reset_state()
         if self.name == "start":
             state.screen = Screen.PLAYING
         if self.name == "high_scores":
@@ -52,9 +53,6 @@ class Button:
             state.screen = Screen.INSTRUCTIONS
         if self.name == "exit":
             state.screen = Screen.EXIT
-
-    def handle_mouse_up(self, position: tuple[int, int]) -> None:
-        self.state = "hover" if self.rect.collidepoint(position) else "normal"
 
     def draw(self, screen: Surface) -> None:
         screen.blit(self._images[self.state], self.rect)

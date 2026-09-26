@@ -2,9 +2,10 @@
 
 import pygame
 
+from src.game.direction import Direction
 from src.game.state import GameState, Screen
 from src.ui.button import Button
-from src.game.direction import Direction
+
 
 class Renderer:
     """Owns the game window and drives the main event loop."""
@@ -48,8 +49,8 @@ class Renderer:
 
         while self._running:
             self._handle_events(state)
+            state.player.update_position()
             self._draw(state)
-
             clock.tick(60)
 
         self._shutdown()
@@ -83,15 +84,16 @@ class Renderer:
                 self._running = False
             elif state.screen != Screen.MENU:
                 state.screen = Screen.MENU
-            self._running = False
-        if key == pygame.K_DOWN:
-            state.player.try_move(Direction.SOUTH)
-        if key == pygame.K_UP:
-            state.player.try_move(Direction.NORTH)
-        if key == pygame.K_RIGHT:
-            state.player.try_move(Direction.EAST)
-        if key == pygame.K_LEFT:
-            state.player.try_move(Direction.WEST)
+
+        if state.screen == Screen.PLAYING:
+            if key == pygame.K_DOWN:
+                state.player.request_move(Direction.SOUTH)
+            if key == pygame.K_UP:
+                state.player.request_move(Direction.NORTH)
+            if key == pygame.K_RIGHT:
+                state.player.request_move(Direction.EAST)
+            if key == pygame.K_LEFT:
+                state.player.request_move(Direction.WEST)
 
     def _draw(self, state: GameState) -> None:
         """Render exactly one frame based on the current game state."""

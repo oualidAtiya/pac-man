@@ -1,9 +1,8 @@
 from enum import Enum, auto
 
-from src.maze.maze import Maze
-
 from src.game.ghost import Ghost
 from src.game.player import Player
+from src.maze.maze import Maze
 
 
 class Screen(Enum):
@@ -13,7 +12,9 @@ class Screen(Enum):
     PLAYING = auto()
     PAUSED = auto()
     GAME_OVER = auto()
-    VICTORY = auto()
+    HIGH_SCORES = auto()
+    INSTRUCTIONS = auto()
+    EXIT = auto()
 
 
 class GameState:

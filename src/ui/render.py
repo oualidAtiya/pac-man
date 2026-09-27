@@ -1,9 +1,9 @@
 """Owns the game window and the main loop."""
 
 import pygame
+
 from src.game.direction import Direction
 from src.game.state import GameState, Screen
-from src.maze.cell import Cell
 from src.ui.button import Button
 
 
@@ -113,19 +113,9 @@ class Renderer:
         self._draw_ghosts(state)
 
     def _draw_ghosts(self, state: GameState) -> None:
-        start_x, start_y = (
-            state.maze.offest_x + Cell.CELL_SIZE,
-            state.maze.offest_y + Cell.CELL_SIZE,
-        )
         for ghost in state.ghosts:
-            ghost_x, ghost_y = ghost.position
-            position = (
-                start_x + ghost_x * Cell.CELL_SIZE * 2,
-                start_y + ghost_y * Cell.CELL_SIZE * 2,
-            )
-            ghost.draw(self._screen, position)
-            print(ghost.color.value, end="-------------\n")
-            ghost.move(state.maze, state.player.position)
+            ghost.draw(self._screen, state.maze)
+            # ghost.move(state.maze, state.player.position)
 
     def _draw_menu(self) -> None:
         self._draw_title()

@@ -7,6 +7,7 @@ import pygame
 from pygame import Surface
 
 from src.game.direction import Direction
+from src.maze.cell import Cell
 from src.maze.maze import Maze
 
 _OPPOSITE = {
@@ -58,7 +59,6 @@ class Ghost:
         """Advance one step according to the current behavior mode."""
         options = self._valid_directions(maze)
         self.direction = self._choose_direction(options, player_position)
-        print(self.direction)
         dx, dy = _DELTA[self.direction]
         row, col = self.position
         self.position = row + dx, col + dy
@@ -85,10 +85,15 @@ class Ghost:
         """
         return random.choice(options)
 
-    def draw(self, screen: Surface, position: tuple[int, int]) -> None:
+    def draw(self, screen: Surface, maze: Maze) -> None:
         sheet = pygame.image.load(
             f"assets/images/ghosts/{self.color.value}_ghost.png"
         ).convert_alpha()
+        start_x = maze.offest_x + Cell.CELL_SIZE
+        start_y = maze.offest_y + Cell.CELL_SIZE
+
+        screen_x = start_x + self.position[0] * Cell.CELL_SIZE * 2
+        screen_y = start_y + self.position[1] * Cell.CELL_SIZE * 2
 
         sprite = sheet.subsurface((0, 0, 32, 32))
-        screen.blit(sprite, position)
+        screen.blit(sprite, (screen_x, screen_y))

@@ -21,7 +21,10 @@ class GameConfig(BaseModel):
         if (data is None):
             return {}
         if (not isinstance(data, dict)):
-            logger.warning("config file should be dict default config will be used")
+            logger.warning(
+                "config file should be dict"
+                " default config will be used"
+            )
             return {}
 
         data_copy = data.copy()
@@ -33,13 +36,21 @@ class GameConfig(BaseModel):
                 continue
 
             default = required_fields[key].default
-            if key != 'highscore_filename' and (not isinstance(value, int) or value <= 0):
-                logger.warning(f"`{key}` should be positive int will be replaced by {default}")
+            if (key != 'highscore_filename'
+                    and (not isinstance(value, int) or value <= 0)):
+                logger.warning(
+                    f"`{key}` should be positive"
+                    " int will be replaced by {default}"
+                )
                 data_copy[key] = default
                 continue
             if key == 'highscore_filename':
-                if not isinstance(value, str) or not re.search(r"^\S+\.json$", value):
-                    logger.warning(f"`{value}` should be valid json file will replaced by `{default}`")
+                if (not isinstance(value, str)
+                        or not re.search(r"^\S+\.json$", value)):
+                    logger.warning(
+                        f"`{value}` should be valid json"
+                        " file will replaced by `{default}`"
+                    )
                     data_copy[key] = default
         if missing_keys:
             logger.warning(f"missing keys: {missing_keys}")

@@ -12,13 +12,16 @@ class Cell:
         return (
             f"(n={self.north}, e={self.east}, s={self.south}, w={self.west})"
         )
+        self.gum_position = (0, 0)
+        self.has_pacgum = False
+        self.has_super_pacgum=  False
 
     @staticmethod
     def get_corner(up: bool, right: bool, bottom: bool, left: bool) -> int:
         if up and right and bottom and left:
             return 11
         if up and right and bottom and not left:
-        return 8
+            return 8
         if up and not right and bottom and left:
             return 13
         if not up and right and bottom and left:

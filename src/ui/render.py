@@ -1,7 +1,6 @@
 """Owns the game window and the main loop."""
 
 import pygame
-
 from src.game.direction import Direction
 from src.game.state import GameState, Screen
 from src.ui.button import Button

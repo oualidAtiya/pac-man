@@ -16,7 +16,6 @@ class Maze:
         self.offest_x = (2000 // 2) - (self.width * 32)
         self.offest_y = (1500 // 2) - (self.height * 32)
 
-
     def draw(self, screen: Surface) -> None:
         corners = {
             i: pygame.image.load(

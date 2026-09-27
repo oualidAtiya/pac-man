@@ -11,11 +11,11 @@ debug:
 	@$(MANAGER) $(PYTHON) pdb pac-man.py
 
 clean:
-	@rm -rf src/__pycache__ .mypy_cache
+	@find . -type d -name "__pycache__" -exec rm -rf {} +
 
 lint:
-	@$(MANAGER) flake8 .
-	@$(MANAGER) mypy . --warn-return-any
+	@$(MANAGER) flake8 pac-man.py src/.
+	@$(MANAGER) mypy src/. --warn-return-any
 	--warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs
 	--check-untyped-defs
 

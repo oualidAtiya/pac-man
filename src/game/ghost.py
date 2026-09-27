@@ -1,7 +1,27 @@
+from __future__ import annotations
+
+import random
 from enum import Enum, auto
+
+import pygame
+from pygame import Surface
 
 from src.game.direction import Direction
 from src.maze.maze import Maze
+
+_OPPOSITE = {
+    Direction.NORTH: Direction.SOUTH,
+    Direction.SOUTH: Direction.NORTH,
+    Direction.EAST: Direction.WEST,
+    Direction.WEST: Direction.EAST,
+}
+
+_DELTA = {
+    Direction.NORTH: (-1, 0),
+    Direction.SOUTH: (1, 0),
+    Direction.EAST: (0, 1),
+    Direction.WEST: (0, -1),
+}
 
 
 class GhostBehavior(Enum):
@@ -12,11 +32,19 @@ class GhostBehavior(Enum):
     EATEN = auto()  # caught by the player, returning to spawn
 
 
+class GhostColor(Enum):
+    RED = "red"
+    PINK = "pink"
+    BLUE = "blue"
+    ORANGE = "orange"
+
+
 class Ghost:
     """A single ghost entity."""
 
-    def __init__(self, position: tuple[int, int], color: str) -> None:
-        self.position = position  # (col, row)
+    def __init__(self, position: tuple[int, int], color: GhostColor) -> None:
+        self.position = position  # (row, col)
+        self.spawn_position = position
         self.direction = Direction.NORTH
         self.behavior = GhostBehavior.CHASE
         self.color = color  # identifies which corner it spawned in
@@ -28,8 +56,39 @@ class Ghost:
 
     def move(self, maze: Maze, player_position: tuple[int, int]) -> None:
         """Advance one step according to the current behavior mode."""
-        raise NotImplementedError
+        options = self._valid_directions(maze)
+        self.direction = self._choose_direction(options, player_position)
+        print(self.direction)
+        dx, dy = _DELTA[self.direction]
+        row, col = self.position
+        self.position = row + dx, col + dy
 
     def set_behavior(self, behavior: GhostBehavior) -> None:
         """Transition to a new behavior mode (e.g. on super-pacgum pickup)."""
         self.behavior = behavior
+
+    def _valid_directions(self, maze: Maze) -> list[Direction]:
+        """Directions not blocked by a wall, excluding reversal unless
+        it's the only option (dead end)."""
+        row, col = self.position
+        options = [d for d in Direction if maze.can_move(row, col, d)]
+        non_reverse = [d for d in options if d != _OPPOSITE[self.direction]]
+        return non_reverse or options
+
+    def _choose_direction(
+        self, options: list[Direction], player_position: tuple[int, int]
+    ) -> Direction:
+        """PLACEHOLDER for step 2: random choice among valid options.
+        Once this is confirmed working, this is the only method that
+        changes to add real chase targeting (compare each option's
+        resulting distance to player_position, pick the minimum).
+        """
+        return random.choice(options)
+
+    def draw(self, screen: Surface, position: tuple[int, int]) -> None:
+        sheet = pygame.image.load(
+            f"assets/images/ghosts/{self.color.value}_ghost.png"
+        ).convert_alpha()
+
+        sprite = sheet.subsurface((0, 0, 32, 32))
+        screen.blit(sprite, position)

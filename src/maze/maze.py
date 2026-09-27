@@ -2,6 +2,7 @@ import pygame
 from pygame import Surface
 
 from src.config.models import GameConfig
+from src.game.direction import Direction
 from src.maze.adapter import MazeAdapter
 
 
@@ -15,6 +16,19 @@ class Maze:
         self.height_maze_px = (32 * config.height + 1) + (32 * config.height)
         self.offest_x = (2000 // 2) - (self.width * 32)
         self.offest_y = (1500 // 2) - (self.height * 32)
+
+    def can_move(self, row: int, col: int, direction: Direction) -> bool:
+        if direction == Direction.NORTH:
+            return row - 1 >= 0 and not self.grid[row][col].north
+
+        if direction == Direction.SOUTH:
+            return row + 1 < self.height and not self.grid[row][col].south
+
+        if direction == Direction.WEST:
+            return col - 1 >= 0 and not self.grid[row][col].west
+
+        if direction == Direction.EAST:
+            return col + 1 < self.width and not self.grid[row][col].east
 
     def draw(self, screen: Surface) -> None:
         corners = {

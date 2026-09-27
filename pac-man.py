@@ -1,5 +1,5 @@
 from src.config.loader import Loader
-from src.game.ghost import Ghost
+from src.game.ghost import Ghost, GhostColor
 from src.game.player import Player
 from src.game.state import GameState
 from src.maze.maze import Maze
@@ -15,10 +15,10 @@ def main():
             maze=maze,
             player=Player(maze),
             ghosts=[
-                Ghost((0, 0), "red"),
-                Ghost((0, 0), "blue"),
-                Ghost((0, 0), "green"),
-                Ghost((0, 0), "yellow"),
+                Ghost((0, 0), GhostColor.RED),
+                Ghost((maze.width - 1, 0), GhostColor.BLUE),
+                Ghost((0, maze.height - 1), GhostColor.PINK),
+                Ghost((maze.width - 1, maze.height - 1), GhostColor.ORANGE),
             ],
             pacgum=Pacgum(maze)
         )

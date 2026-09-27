@@ -4,7 +4,7 @@ from src.game.player import Player
 from src.game.state import GameState
 from src.maze.maze import Maze
 from src.ui.render import Renderer
-
+from src.game.pacgum import Pacgum
 
 def main():
     loader = Loader()
@@ -20,6 +20,7 @@ def main():
                 Ghost((0, 0), "green"),
                 Ghost((0, 0), "yellow"),
             ],
+            pacgum=Pacgum(maze)
         )
         render = Renderer(2000, 1500)
         render.run(state)

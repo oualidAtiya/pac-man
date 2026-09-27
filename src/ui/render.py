@@ -107,6 +107,7 @@ class Renderer:
 
     def _draw_gameplay(self, state: GameState) -> None:
         state.maze.draw(self._screen)
+        state.pacgum.draw(self._screen)
         state.player.draw(self._screen)
 
     def _draw_menu(self) -> None:

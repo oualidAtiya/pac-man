@@ -3,7 +3,7 @@ from enum import Enum, auto
 from src.game.ghost import Ghost
 from src.game.player import Player
 from src.maze.maze import Maze
-
+from src.game.pacgum import Pacgum
 
 class Screen(Enum):
     """Which screen/phase the game is currently in."""
@@ -23,12 +23,13 @@ class GameState:
     """
 
     def __init__(
-        self, maze: Maze, player: Player, ghosts: list[Ghost]
+        self, maze: Maze, player: Player, ghosts: list[Ghost], pacgum: Pacgum
     ) -> None:
         self.screen = Screen.MENU
         self.maze = maze
         self.player = player
         self.ghosts = ghosts
+        self.pacgum = pacgum
         self.score = 0
         self.lives = 3
         self.level = 1

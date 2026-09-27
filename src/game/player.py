@@ -77,6 +77,9 @@ class Player:
             self.acc += step
             if self.acc == 64:
                 self.current_cell = self.target
+                y, x = self.current_cell
+                self.maze.grid[y][x].has_pacgum = False
+                self.maze.grid[y][x].has_super_pacgum = False
                 self.target = None
                 self.acc = 0
                 if (self.next_direction

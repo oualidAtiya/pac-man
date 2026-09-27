@@ -33,6 +33,7 @@ class Maze:
         for y in range(self.height):
             for x in range(self.width):
                 cell = self.grid[y][x]
+                cell.gum_position = (x_px+32, y_px+32)
                 west_cell = None
                 north_cell = None
                 east_cell = None

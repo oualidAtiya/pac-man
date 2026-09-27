@@ -1,4 +1,6 @@
 class Cell:
+    CELL_SIZE = 32
+
     def __init__(self, cell_value: int) -> None:
         self.north = (cell_value & 1) != 0
         self.east = (cell_value & 2) != 0
@@ -7,15 +9,17 @@ class Cell:
         self.is_42 = cell_value == 15
 
     def __repr__(self):
-        return f"(n={self.north}, e={self.east}, s={self.south}, w={self.west})"
+        return (
+            f"(n={self.north}, e={self.east}, s={self.south}, w={self.west})"
+        )
 
     @staticmethod
     def get_corner(up: bool, right: bool, bottom: bool, left: bool) -> int:
         if up and right and bottom and left:
             return 11
         if up and right and bottom and not left:
-            return 8
-        if up and not right and bottom and  left:
+        return 8
+        if up and not right and bottom and left:
             return 13
         if not up and right and bottom and left:
             return 12
@@ -35,9 +39,9 @@ class Cell:
             return 15
         if up and not right and not bottom and not left:
             return 16
-        if not up and not right and  not bottom and left:
+        if not up and not right and not bottom and left:
             return 9
-        if not up and  right and  not bottom and not left:
+        if not up and right and not bottom and not left:
             return 14
         if not up and right and not bottom and left:
             return 6

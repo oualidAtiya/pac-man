@@ -18,10 +18,10 @@ _OPPOSITE = {
 }
 
 _DELTA = {
-    Direction.NORTH: (-1, 0),
-    Direction.SOUTH: (1, 0),
-    Direction.EAST: (0, 1),
-    Direction.WEST: (0, -1),
+    Direction.NORTH: (0, -1),
+    Direction.SOUTH: (0, 1),
+    Direction.EAST: (1, 0),
+    Direction.WEST: (-1, 0),
 }
 
 
@@ -44,11 +44,15 @@ class Ghost:
     """A single ghost entity."""
 
     def __init__(self, position: tuple[int, int], color: GhostColor) -> None:
-        self.position = position  # (row, col)
+        self.position = position  # (col, row)
         self.spawn_position = position
         self.direction = Direction.NORTH
         self.behavior = GhostBehavior.CHASE
         self.color = color  # identifies which corner it spawned in
+
+        self.target: tuple[int, int] | None = None
+        self.progress = 0
+        self.speed = 2
 
     @property
     def is_edible(self) -> bool:
@@ -57,11 +61,26 @@ class Ghost:
 
     def move(self, maze: Maze, player_position: tuple[int, int]) -> None:
         """Advance one step according to the current behavior mode."""
+        if self.target is not None:
+            return
+
         options = self._valid_directions(maze)
         self.direction = self._choose_direction(options, player_position)
+
         dx, dy = _DELTA[self.direction]
-        row, col = self.position
-        self.position = row + dx, col + dy
+        col, row = self.position
+        self.target = col + dx, row + dy
+        self.progress = 0
+
+    def update_position(self) -> None:
+        if self.target is None:
+            return
+
+        self.progress += self.speed
+        if self.progress >= Cell.CELL_SIZE * 2:
+            self.position = self.target
+            self.target = None
+            self.progress = 0
 
     def set_behavior(self, behavior: GhostBehavior) -> None:
         """Transition to a new behavior mode (e.g. on super-pacgum pickup)."""
@@ -70,8 +89,11 @@ class Ghost:
     def _valid_directions(self, maze: Maze) -> list[Direction]:
         """Directions not blocked by a wall, excluding reversal unless
         it's the only option (dead end)."""
-        row, col = self.position
-        options = [d for d in Direction if maze.can_move(row, col, d)]
+        directions = list(Direction)
+        random.shuffle(directions)
+        col, row = self.position
+
+        options = [d for d in directions if maze.can_move(col, row, d)]
         non_reverse = [d for d in options if d != _OPPOSITE[self.direction]]
         return non_reverse or options
 
@@ -89,11 +111,26 @@ class Ghost:
         sheet = pygame.image.load(
             f"assets/images/ghosts/{self.color.value}_ghost.png"
         ).convert_alpha()
+
+        col, row = self.position
+        if self.target is not None:
+            target_col, target_row = self.target
+            ratio = self.progress / (Cell.CELL_SIZE * 2)
+            col += (target_col - col) * ratio
+            row += (target_row - row) * ratio
+
         start_x = maze.offest_x + Cell.CELL_SIZE
         start_y = maze.offest_y + Cell.CELL_SIZE
 
-        screen_x = start_x + self.position[0] * Cell.CELL_SIZE * 2
-        screen_y = start_y + self.position[1] * Cell.CELL_SIZE * 2
+        screen_x = start_x + col * Cell.CELL_SIZE * 2
+        screen_y = start_y + row * Cell.CELL_SIZE * 2
 
-        sprite = sheet.subsurface((0, 0, 32, 32))
+        frame_width = 32
+        frame_height = 32
+
+        frame = (pygame.time.get_ticks() // 150) % 4
+
+        sprite = sheet.subsurface(
+            (frame * frame_width, 0, frame_width, frame_height)
+        )
         screen.blit(sprite, (screen_x, screen_y))

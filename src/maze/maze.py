@@ -17,7 +17,7 @@ class Maze:
         self.offest_x = (2000 // 2) - (self.width * 32)
         self.offest_y = (1500 // 2) - (self.height * 32)
 
-    def can_move(self, row: int, col: int, direction: Direction) -> bool:
+    def can_move(self, col: int, row: int, direction: Direction) -> bool:
         if direction == Direction.NORTH:
             return row - 1 >= 0 and not self.grid[row][col].north
 
@@ -47,7 +47,7 @@ class Maze:
         for y in range(self.height):
             for x in range(self.width):
                 cell = self.grid[y][x]
-                cell.gum_position = (x_px+32, y_px+32)
+                cell.gum_position = (x_px + 32, y_px + 32)
                 west_cell = None
                 north_cell = None
                 east_cell = None

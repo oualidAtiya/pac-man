@@ -49,7 +49,6 @@ class Renderer:
 
         while self._running:
             self._handle_events(state)
-            state.player.update_position()
             self._draw(state)
             clock.tick(60)
 
@@ -107,15 +106,23 @@ class Renderer:
         pygame.display.flip()
 
     def _draw_gameplay(self, state: GameState) -> None:
+        self._draw_maze(state)
+        self._draw_player(state)
+        self._draw_ghosts(state)
+
+    def _draw_maze(self, state: GameState) -> None:
         state.maze.draw(self._screen)
         state.pacgum.draw(self._screen)
+
+    def _draw_player(self, state: GameState) -> None:
+        state.player.update_position()
         state.player.draw(self._screen)
-        self._draw_ghosts(state)
 
     def _draw_ghosts(self, state: GameState) -> None:
         for ghost in state.ghosts:
+            ghost.move(state.maze, state.player.position)
+            ghost.update_position()
             ghost.draw(self._screen, state.maze)
-            # ghost.move(state.maze, state.player.position)
 
     def _draw_menu(self) -> None:
         self._draw_title()

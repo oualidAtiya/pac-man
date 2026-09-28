@@ -50,6 +50,10 @@ class Ghost:
         self.behavior = GhostBehavior.CHASE
         self.color = color  # identifies which corner it spawned in
 
+        self.target: tuple[int, int] | None = None
+        self.progress = 0
+        self.speed = 2
+
     @property
     def is_edible(self) -> bool:
         """Whether the player can currently eat this ghost."""
@@ -57,13 +61,26 @@ class Ghost:
 
     def move(self, maze: Maze, player_position: tuple[int, int]) -> None:
         """Advance one step according to the current behavior mode."""
+        if self.target is not None:
+            return
+
         options = self._valid_directions(maze)
         self.direction = self._choose_direction(options, player_position)
 
-    def update_position(self) -> None:
         dx, dy = _DELTA[self.direction]
         col, row = self.position
-        self.position = col + dx, row + dy
+        self.target = col + dx, row + dy
+        self.progress = 0
+
+    def update_position(self) -> None:
+        if self.target is None:
+            return
+
+        self.progress += self.speed
+        if self.progress >= Cell.CELL_SIZE * 2:
+            self.position = self.target
+            self.target = None
+            self.progress = 0
 
     def set_behavior(self, behavior: GhostBehavior) -> None:
         """Transition to a new behavior mode (e.g. on super-pacgum pickup)."""
@@ -94,11 +111,26 @@ class Ghost:
         sheet = pygame.image.load(
             f"assets/images/ghosts/{self.color.value}_ghost.png"
         ).convert_alpha()
+
+        col, row = self.position
+        if self.target is not None:
+            target_col, target_row = self.target
+            ratio = self.progress / (Cell.CELL_SIZE * 2)
+            col += (target_col - col) * ratio
+            row += (target_row - row) * ratio
+
         start_x = maze.offest_x + Cell.CELL_SIZE
         start_y = maze.offest_y + Cell.CELL_SIZE
 
-        screen_x = start_x + self.position[0] * Cell.CELL_SIZE * 2
-        screen_y = start_y + self.position[1] * Cell.CELL_SIZE * 2
+        screen_x = start_x + col * Cell.CELL_SIZE * 2
+        screen_y = start_y + row * Cell.CELL_SIZE * 2
 
-        sprite = sheet.subsurface((0, 0, 32, 32))
+        frame_width = 32
+        frame_height = 32
+
+        frame = (pygame.time.get_ticks() // 150) % 4
+
+        sprite = sheet.subsurface(
+            (frame * frame_width, 0, frame_width, frame_height)
+        )
         screen.blit(sprite, (screen_x, screen_y))

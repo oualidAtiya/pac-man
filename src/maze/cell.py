@@ -7,14 +7,14 @@ class Cell:
         self.south = (cell_value & 4) != 0
         self.west = (cell_value & 8) != 0
         self.is_42 = cell_value == 15
+        self.gum_position = (0, 0)
+        self.has_pacgum = False
+        self.has_super_pacgum=  False
 
     def __repr__(self):
         return (
             f"(n={self.north}, e={self.east}, s={self.south}, w={self.west})"
         )
-        self.gum_position = (0, 0)
-        self.has_pacgum = False
-        self.has_super_pacgum=  False
 
     @staticmethod
     def get_corner(up: bool, right: bool, bottom: bool, left: bool) -> int:

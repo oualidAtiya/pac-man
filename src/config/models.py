@@ -40,7 +40,7 @@ class GameConfig(BaseModel):
                     and (not isinstance(value, int) or value <= 0)):
                 logger.warning(
                     f"`{key}` should be positive"
-                    " int will be replaced by {default}"
+                    f" int will be replaced by {default}"
                 )
                 data_copy[key] = default
                 continue
@@ -49,7 +49,7 @@ class GameConfig(BaseModel):
                         or not re.search(r"^\S+\.json$", value)):
                     logger.warning(
                         f"`{value}` should be valid json"
-                        " file will replaced by `{default}`"
+                        f" file will replaced by `{default}`"
                     )
                     data_copy[key] = default
         if missing_keys:

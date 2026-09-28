@@ -30,7 +30,5 @@ class GameState:
         self.player = player
         self.ghosts = ghosts
         self.pacgum = pacgum
-        self.score = 0
-        self.lives = 3
         self.level = 1
         self.time_remaining = 0.0

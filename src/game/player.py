@@ -10,14 +10,16 @@ class Player:
         self.height = maze.config.height
         self.width = maze.config.width
         self.maze = maze
-        self.current_cell = (self.width//2, self.height//2)
+        self.current_cell = (self.height//2, self.width//2)
         self.position = (
             (maze.width_maze_px//2)+maze.offest_x,
             (maze.height_maze_px//2)+maze.offest_y
         )
-        self.current_direction = Direction.EAST
+        self.current_direction = None
         self.next_direction: None | Direction = None
         self.target: None | tuple[int, int] = None
+        self.score = 0
+        self.lives = maze.config.lives
         self.acc = 0
 
     def _get_current_frame(self) -> int:
@@ -77,15 +79,13 @@ class Player:
             self.acc += step
             if self.acc == 64:
                 self.current_cell = self.target
-                y, x = self.current_cell
-                self.maze.grid[y][x].has_pacgum = False
-                self.maze.grid[y][x].has_super_pacgum = False
                 self.target = None
                 self.acc = 0
+                self.eat_current_cell()
                 if (self.next_direction
                    and self._can_move(self.next_direction)):
                     self.request_move(self.next_direction)
-                elif self._can_move(self.current_direction):
+                elif self.current_direction and self._can_move(self.current_direction):
                     self.request_move(self.current_direction)
                 else:
                     self.next_direction = None
@@ -115,3 +115,32 @@ class Player:
             self.current_direction = direction
         else:
             self.next_direction = direction
+
+    def eat_current_cell(self) -> None:
+        y, x = self.current_cell
+        cell = self.maze.grid[y][x]
+        if cell.has_super_pacgum:
+            cell.has_super_pacgum = False
+            self.add_score(self.maze.config.points_per_super_pacgum)
+        if cell.has_pacgum:
+            cell.has_pacgum = False
+            self.add_score(self.maze.config.points_per_pacgum)
+
+    def respawn(self):
+        self.current_cell = (self.width//2, self.height//2)
+        self.position = (
+            (self.maze.width_maze_px//2)+self.maze.offest_x,
+            (self.maze.height_maze_px//2)+self.maze.offest_y
+        )
+        self.current_direction = None
+        self.next_direction = None
+
+
+    def lose_life(self) -> bool:
+        self.lives -= 1
+        if self.lives == 0:
+            return True
+        return False
+
+    def add_score(self, score):
+        self.score += score

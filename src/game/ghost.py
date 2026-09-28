@@ -18,10 +18,10 @@ _OPPOSITE = {
 }
 
 _DELTA = {
-    Direction.NORTH: (-1, 0),
-    Direction.SOUTH: (1, 0),
-    Direction.EAST: (0, 1),
-    Direction.WEST: (0, -1),
+    Direction.NORTH: (0, -1),
+    Direction.SOUTH: (0, 1),
+    Direction.EAST: (1, 0),
+    Direction.WEST: (-1, 0),
 }
 
 
@@ -44,7 +44,7 @@ class Ghost:
     """A single ghost entity."""
 
     def __init__(self, position: tuple[int, int], color: GhostColor) -> None:
-        self.position = position  # (row, col)
+        self.position = position  # (col, row)
         self.spawn_position = position
         self.direction = Direction.NORTH
         self.behavior = GhostBehavior.CHASE
@@ -59,9 +59,11 @@ class Ghost:
         """Advance one step according to the current behavior mode."""
         options = self._valid_directions(maze)
         self.direction = self._choose_direction(options, player_position)
+
+    def update_position(self) -> None:
         dx, dy = _DELTA[self.direction]
-        row, col = self.position
-        self.position = row + dx, col + dy
+        col, row = self.position
+        self.position = col + dx, row + dy
 
     def set_behavior(self, behavior: GhostBehavior) -> None:
         """Transition to a new behavior mode (e.g. on super-pacgum pickup)."""
@@ -70,8 +72,11 @@ class Ghost:
     def _valid_directions(self, maze: Maze) -> list[Direction]:
         """Directions not blocked by a wall, excluding reversal unless
         it's the only option (dead end)."""
-        row, col = self.position
-        options = [d for d in Direction if maze.can_move(row, col, d)]
+        directions = list(Direction)
+        random.shuffle(directions)
+        col, row = self.position
+
+        options = [d for d in directions if maze.can_move(col, row, d)]
         non_reverse = [d for d in options if d != _OPPOSITE[self.direction]]
         return non_reverse or options
 

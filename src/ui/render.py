@@ -11,10 +11,12 @@ class Renderer:
     """Owns the game window and drives the main event loop."""
 
     def __init__(
-        self, width: int, height: int, title: str = "Pac-Man"
+        self, width: int, height: int, fps: int = 60, title: str = "Pac-Man"
     ) -> None:
         """Initialize pygame and open the window. Called once at startup."""
         pygame.init()
+        self.fps = fps
+        self.delta_time = 0.0
         self.width = width
         self.height = height
         self._screen = pygame.display.set_mode((width, height))
@@ -48,12 +50,14 @@ class Renderer:
         clock = pygame.time.Clock()
 
         while self._running:
+            self.delta_time = clock.tick(self.fps) / 1000
             self._handle_events(state)
+
             if state.screen == Screen.PLAYING:
                 self.update(state)
-                state.update()
+                state.update(self.delta_time)
+
             self._draw(state)
-            clock.tick(60)
 
         self._shutdown()
 
@@ -132,7 +136,7 @@ class Renderer:
 
     def _draw_ghosts(self, state: GameState) -> None:
         for ghost in state.ghosts:
-            ghost.draw(self._screen, state)
+            ghost.draw(self._screen, state, self.delta_time)
 
     def _draw_menu(self) -> None:
         self._draw_title()

@@ -1,26 +1,35 @@
-from src.maze.maze import Maze
-from pygame import Surface
-from random import shuffle
-import pygame
 from enum import Enum
+from random import shuffle
+
+import pygame
+from pygame import Surface
+
+from src.maze.maze import Maze
 
 
 class PacgumType(Enum):
     NORMAL = 1
-    SUPER = 2  
- 
+    SUPER = 2
+
+
 class Pacgum:
-    def __init__(self, maze: Maze) -> None:
+    def __init__(
+        self,
+        maze: Maze,
+        pacgum_number: int = 80,
+        super_pacgum_duration: int = 10,
+    ) -> None:
         self.maze = maze
         self.super_gum_positions = (
             (0, 0),
-            (0, self.maze.height-1),
-            (self.maze.width-1, 0),
-            (self.maze.width-1, self.maze.height-1)
+            (0, self.maze.height - 1),
+            (self.maze.width - 1, 0),
+            (self.maze.width - 1, self.maze.height - 1),
         )
         self.cell_positions = self.__set_allowed_positions()
-        self.pacgum_number = 80
+        self.pacgum_number = pacgum_number
         self.pac_gum_positions = self.__put_gums()
+        self.super_pacgum_duration = super_pacgum_duration
 
     def __set_allowed_positions(self):
         positions = []
@@ -31,24 +40,21 @@ class Pacgum:
                     positions.append((y, x))
         return positions
 
- 
     def draw(self, screen: Surface) -> None:
-        gum = pygame.image.load(
-                f"assets/images/gum.png"
-            ).convert_alpha()
+        gum = pygame.image.load("assets/images/gum.png").convert_alpha()
         super_gum = pygame.image.load(
-                f"assets/images/super_gum.png"
-            ).convert_alpha()
+            "assets/images/super_gum.png"
+        ).convert_alpha()
         for y, x in self.pac_gum_positions:
-                cell = self.maze.grid[y][x]
-                if (cell.has_pacgum):
-                    screen.blit(gum, cell.gum_position)
+            cell = self.maze.grid[y][x]
+            if cell.has_pacgum:
+                screen.blit(gum, cell.gum_position)
 
         for y, x in self.super_gum_positions:
             cell = self.maze.grid[y][x]
-            if (cell.has_super_pacgum):
+            if cell.has_super_pacgum:
                 screen.blit(super_gum, cell.gum_position)
-                    
+
     def __put_gums(self) -> None:
         positions = []
         for _ in range(self.pacgum_number):

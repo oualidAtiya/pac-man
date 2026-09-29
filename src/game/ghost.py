@@ -91,6 +91,10 @@ class Ghost:
         """Transition to a new behavior mode (e.g. on super-pacgum pickup)."""
         self.behavior = behavior
 
+    def respawn(self) -> None:
+        self.position = self.spawn_position
+        self.target = None
+
     def _valid_directions(self, maze: Maze) -> list[Direction]:
         """Directions not blocked by a wall, excluding reversal unless
         it's the only option (dead end)."""
@@ -115,7 +119,12 @@ class Ghost:
         # elif self.behavior == GhostBehavior.FLEE: ... # Run away from the palyer
         return random.choice(options)
 
-    def draw(self, screen: Surface, state: GameState) -> None:
+    def draw(
+        self,
+        screen: Surface,
+        state: GameState,
+        delta_time: float,
+    ) -> None:
         sheet = pygame.image.load(
             f"assets/images/ghosts/{self.color.value}_ghost.png"
         ).convert_alpha()

@@ -1,9 +1,10 @@
 from enum import Enum, auto
 
-from src.game.ghost import Ghost
+from src.game.ghost import Ghost, GhostBehavior
 from src.game.player import Player
 from src.maze.maze import Maze
 from src.game.pacgum import Pacgum
+from src.game.player import PacgumType
 
 class Screen(Enum):
     """Which screen/phase the game is currently in."""
@@ -32,3 +33,14 @@ class GameState:
         self.pacgum = pacgum
         self.level = 1
         self.time_remaining = 0.0
+
+    def update(self):
+        eaten = self.player.eat_current_cell()
+        if eaten:
+            if eaten == PacgumType.NORMAL:
+                self.player.add_score(self.maze.config.points_per_pacgum)
+            else:
+                for ghost in self.ghosts:
+                    ghost.set_behavior(GhostBehavior.FLEE)
+                #TODO: collision logic
+                self.player.add_score(self.maze.config.points_per_super_pacgum)

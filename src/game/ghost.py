@@ -54,7 +54,7 @@ class Ghost:
         self.direction = Direction.NORTH
         self.behavior = GhostBehavior.CHASE
         self.color = color  # identifies which corner it spawned in
-
+        self.position_px = (0, 0)
         self.target: tuple[int, int] | None = None
         self.progress = 0
         self.speed = 2
@@ -152,6 +152,7 @@ class Ghost:
 
         screen_x = start_x + col * Cell.CELL_SIZE * 2
         screen_y = start_y + row * Cell.CELL_SIZE * 2
+        self.position_px = (screen_x, screen_y)
 
         frame_width = 32
         frame_height = 32

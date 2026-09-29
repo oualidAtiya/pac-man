@@ -59,3 +59,15 @@ class GameState:
             if self.super_pacgum_timer <= 0:
                 for ghost in self.ghosts:
                     ghost.set_behavior(GhostBehavior.CHASE)
+
+        p_col, p_row = self.player.position
+        for ghost in self.ghosts:
+            g_col, g_row = ghost.position_px
+            difference = (abs(p_row-g_row), abs(p_col-g_col))
+            if difference[0] <= 16 and difference[1] <= 16:
+                if ghost.behavior == GhostBehavior.FLEE:
+                    ghost.respawn()
+                else:
+                   if self.player.lose_life():
+                       ...
+                   self.player.respawn()

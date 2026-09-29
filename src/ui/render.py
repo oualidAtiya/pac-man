@@ -49,8 +49,8 @@ class Renderer:
 
         while self._running:
             self._handle_events(state)
-            self.update(state)
             if state.screen == Screen.PLAYING:
+                self.update(state)
                 state.update()
             self._draw(state)
             clock.tick(60)

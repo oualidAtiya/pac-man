@@ -87,7 +87,11 @@ class Renderer:
             elif state.screen != Screen.MENU:
                 state.screen = Screen.MENU
 
-        if state.screen == Screen.PLAYING:
+        if state.screen == Screen.MENU:
+            if key == pygame.K_RETURN:
+                state.screen = Screen.PLAYING
+
+        elif state.screen == Screen.PLAYING:
             if key == pygame.K_DOWN:
                 state.player.request_move(Direction.SOUTH)
             if key == pygame.K_UP:

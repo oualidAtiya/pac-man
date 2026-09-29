@@ -1,5 +1,10 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from src.game.state import GameState
+
 import random
 from enum import Enum, auto
 
@@ -59,13 +64,13 @@ class Ghost:
         """Whether the player can currently eat this ghost."""
         return self.behavior == GhostBehavior.FLEE
 
-    def move(self, maze: Maze, player_position: tuple[int, int]) -> None:
+    def move(self, state: GameState) -> None:
         """Advance one step according to the current behavior mode."""
         if self.target is not None:
             return
 
-        options = self._valid_directions(maze)
-        self.direction = self._choose_direction(options, player_position)
+        options = self._valid_directions(state.maze)
+        self.direction = self._choose_direction(options, state.player.position)
 
         dx, dy = _DELTA[self.direction]
         col, row = self.position
@@ -105,12 +110,26 @@ class Ghost:
         changes to add real chase targeting (compare each option's
         resulting distance to player_position, pick the minimum).
         """
+        # TODO: Implement the direction decisions
+        # if self.behavior == GhostBehavior.CHASE: ...  # Chase the player
+        # elif self.behavior == GhostBehavior.FLEE: ... # Run away from the palyer
         return random.choice(options)
 
-    def draw(self, screen: Surface, maze: Maze) -> None:
+    def draw(self, screen: Surface, state: GameState) -> None:
         sheet = pygame.image.load(
             f"assets/images/ghosts/{self.color.value}_ghost.png"
         ).convert_alpha()
+
+        scared_ghost_themes = [
+            "assets/images/ghosts/scared_white_ghost.png",
+            "assets/images/ghosts/scared_dark_ghost.png",
+        ]
+
+        if self.behavior == GhostBehavior.FLEE:
+            count = len(scared_ghost_themes)
+            sheet = pygame.image.load(
+                scared_ghost_themes[(pygame.time.get_ticks() // 500) % count]
+            ).convert_alpha()
 
         col, row = self.position
         if self.target is not None:
@@ -119,8 +138,8 @@ class Ghost:
             col += (target_col - col) * ratio
             row += (target_row - row) * ratio
 
-        start_x = maze.offest_x + Cell.CELL_SIZE
-        start_y = maze.offest_y + Cell.CELL_SIZE
+        start_x = state.maze.offest_x + Cell.CELL_SIZE
+        start_y = state.maze.offest_y + Cell.CELL_SIZE
 
         screen_x = start_x + col * Cell.CELL_SIZE * 2
         screen_y = start_y + row * Cell.CELL_SIZE * 2

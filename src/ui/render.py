@@ -5,7 +5,7 @@ import pygame
 from src.game.direction import Direction
 from src.game.state import GameState, Screen
 from src.ui.button import Button
-from src.game.player import PacgumType
+
 
 class Renderer:
     """Owns the game window and drives the main event loop."""
@@ -50,7 +50,7 @@ class Renderer:
         while self._running:
             self._handle_events(state)
             self.update(state)
-            if state.screen ==  Screen.PLAYING:
+            if state.screen == Screen.PLAYING:
                 state.update()
             self._draw(state)
             clock.tick(60)
@@ -117,11 +117,10 @@ class Renderer:
         self._draw_player(state)
         self._draw_ghosts(state)
 
-
     def update(self, state: GameState) -> None:
         state.player.update_position()
         for ghost in state.ghosts:
-            ghost.move(state.maze, state.player.position)
+            ghost.move(state)
             ghost.update_position()
 
     def _draw_maze_pacgum(self, state: GameState) -> None:
@@ -133,7 +132,7 @@ class Renderer:
 
     def _draw_ghosts(self, state: GameState) -> None:
         for ghost in state.ghosts:
-            ghost.draw(self._screen, state.maze)
+            ghost.draw(self._screen, state)
 
     def _draw_menu(self) -> None:
         self._draw_title()

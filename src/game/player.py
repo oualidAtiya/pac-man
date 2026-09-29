@@ -4,6 +4,7 @@ from pygame import Surface
 from src.game.direction import Direction
 from src.maze.maze import Maze
 
+from src.game.pacgum import PacgumType
 
 class Player:
     def __init__(self, maze: Maze) -> None:
@@ -15,6 +16,7 @@ class Player:
             (maze.width_maze_px // 2) + maze.offest_x,
             (maze.height_maze_px // 2) + maze.offest_y,
         )
+        self.respawn_position = self.position
         self.current_direction = None
         self.next_direction: None | Direction = None
         self.target: None | tuple[int, int] = None
@@ -66,7 +68,7 @@ class Player:
                 (x_px, y_px),
             )
 
-    def update_position(self) -> None:
+    def update_position(self) -> bool:
         step = 4
         if self.target:
             if self.current_direction == Direction.SOUTH:
@@ -82,8 +84,8 @@ class Player:
                 self.current_cell = self.target
                 self.target = None
                 self.acc = 0
-                self.eat_current_cell()
-                if self.next_direction and self._can_move(self.next_direction):
+                if (self.next_direction
+                   and self._can_move(self.next_direction)):
                     self.request_move(self.next_direction)
                 elif self.current_direction and self._can_move(
                     self.current_direction
@@ -91,6 +93,8 @@ class Player:
                     self.request_move(self.current_direction)
                 else:
                     self.next_direction = None
+                return True
+        return False
 
     def _can_move(self, direction: Direction) -> tuple[int, int] | None:
         y, x = self.current_cell
@@ -124,22 +128,23 @@ class Player:
         else:
             self.next_direction = direction
 
-    def eat_current_cell(self) -> None:
+    def eat_current_cell(self) -> None | PacgumType:
         y, x = self.current_cell
         cell = self.maze.grid[y][x]
         if cell.has_super_pacgum:
             cell.has_super_pacgum = False
-            self.add_score(self.maze.config.points_per_super_pacgum)
+            return PacgumType.SUPER
         if cell.has_pacgum:
             cell.has_pacgum = False
-            self.add_score(self.maze.config.points_per_pacgum)
+            return PacgumType.NORMAL
+        return None
+            
 
     def respawn(self):
-        self.current_cell = (self.width // 2, self.height // 2)
-        self.position = (
-            (self.maze.width_maze_px // 2) + self.maze.offest_x,
-            (self.maze.height_maze_px // 2) + self.maze.offest_y,
-        )
+        self.current_cell = (self.height//2, self.width//2)
+        self.position = self.respawn_position
+        self.acc = 0
+        self.target = None
         self.current_direction = None
         self.next_direction = None
 

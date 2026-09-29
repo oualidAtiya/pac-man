@@ -2,7 +2,13 @@ from src.maze.maze import Maze
 from pygame import Surface
 from random import shuffle
 import pygame
+from enum import Enum
 
+
+class PacgumType(Enum):
+    NORMAL = 1
+    SUPER = 2  
+ 
 class Pacgum:
     def __init__(self, maze: Maze) -> None:
         self.maze = maze

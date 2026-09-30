@@ -39,6 +39,10 @@ class GameState:
         self.time_remaining = 0.0
         self.super_pacgum_timer = 0.0
 
+    def respawn_all_ghosts(self):
+        for ghost in self.ghosts:
+            ghost.respawn()
+
     def update(self, delta_time: float):
         eaten = self.player.eat_current_cell()
 
@@ -62,13 +66,14 @@ class GameState:
         p_col, p_row = self.player.position
         for ghost in self.ghosts:
             g_col, g_row = ghost.position_px
-            difference = (abs(p_row - g_row), abs(p_col - g_col))
-            if difference[0] <= 16 and difference[1] <= 16:
+            difference = (abs(p_row-g_row), abs(p_col-g_col))
+            if difference[0] <= 30 and difference[1] <= 30:
                 if ghost.behavior == GhostBehavior.FLEE:
                     ghost.respawn()
                 else:
                     if self.player.lose_life():
                         ...
-                    for ghost in self.ghosts:
-                        ghost.respawn()
+                    self.player.dead_counter = 120
+                    self.player.dead_position = self.player.position
+                    self.respawn_all_ghosts()
                     self.player.respawn()

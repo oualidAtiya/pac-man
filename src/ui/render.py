@@ -57,9 +57,11 @@ class Renderer:
             self._handle_events(state)
 
             if state.screen == Screen.PLAYING:
-                self.update(state)
-                state.update(self.delta_time)
-
+                if state.player.dead_counter <= 0:
+                    self.update(state)
+                    state.update(self.delta_time)
+                else:
+                    state.player.dead_counter -= 1
             self._draw(state)
 
         self._shutdown()
@@ -98,7 +100,7 @@ class Renderer:
             if key == pygame.K_RETURN:
                 state.screen = Screen.PLAYING
 
-        elif state.screen == Screen.PLAYING:
+        elif state.screen == Screen.PLAYING and state.player.dead_counter <= 0:
             if key == pygame.K_DOWN:
                 state.player.request_move(Direction.SOUTH)
             if key == pygame.K_UP:

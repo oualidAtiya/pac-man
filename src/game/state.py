@@ -50,7 +50,6 @@ class GameState:
 
             for ghost in self.ghosts:
                 ghost.set_behavior(GhostBehavior.FLEE)
-            # TODO: collision logic
             self.player.add_score(self.maze.config.points_per_super_pacgum)
 
         if self.super_pacgum_timer > 0:
@@ -63,11 +62,13 @@ class GameState:
         p_col, p_row = self.player.position
         for ghost in self.ghosts:
             g_col, g_row = ghost.position_px
-            difference = (abs(p_row-g_row), abs(p_col-g_col))
+            difference = (abs(p_row - g_row), abs(p_col - g_col))
             if difference[0] <= 16 and difference[1] <= 16:
                 if ghost.behavior == GhostBehavior.FLEE:
                     ghost.respawn()
                 else:
-                   if self.player.lose_life():
-                       ...
-                   self.player.respawn()
+                    if self.player.lose_life():
+                        ...
+                    for ghost in self.ghosts:
+                        ghost.respawn()
+                    self.player.respawn()

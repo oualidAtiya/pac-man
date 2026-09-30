@@ -1,3 +1,5 @@
+from collections import deque
+
 import pygame
 from pygame import Surface
 
@@ -29,6 +31,43 @@ class Maze:
 
         if direction == Direction.EAST:
             return col + 1 < self.width and not self.grid[row][col].east
+
+    def distance(
+        self,
+        first_position: tuple[int, int],
+        second_position: tuple[int, int],
+    ) -> int | None:
+        queue = deque([(first_position, 0)])
+        visited = {first_position}
+
+        while queue:
+            (col, row), curr_distance = queue.popleft()
+
+            if (col, row) == second_position:
+                return curr_distance
+
+            for direction in Direction:
+                if not self.can_move(col, row, direction):
+                    continue
+
+                if direction == Direction.NORTH:
+                    next_position = col, row - 1
+                elif direction == Direction.SOUTH:
+                    next_position = col, row + 1
+                elif direction == Direction.WEST:
+                    next_position = col - 1, row
+                elif direction == direction.EAST:
+                    next_position = col + 1, row
+
+                if next_position in visited:
+                    continue
+
+                next_distance = curr_distance + 1
+
+                visited.add(next_position)
+                queue.append((next_position, next_distance))
+
+        return None
 
     def draw(self, screen: Surface) -> None:
         corners = {

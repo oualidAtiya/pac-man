@@ -15,13 +15,6 @@ from src.game.direction import Direction
 from src.maze.cell import Cell
 from src.maze.maze import Maze
 
-_OPPOSITE = {
-    Direction.NORTH: Direction.SOUTH,
-    Direction.SOUTH: Direction.NORTH,
-    Direction.EAST: Direction.WEST,
-    Direction.WEST: Direction.EAST,
-}
-
 _DELTA = {
     Direction.NORTH: (0, -1),
     Direction.SOUTH: (0, 1),
@@ -70,7 +63,7 @@ class Ghost:
             return
 
         options = self._valid_directions(state.maze)
-        self.direction = self._choose_direction(options, state.player.position)
+        self.direction = self._choose_direction(state, options)
 
         dx, dy = _DELTA[self.direction]
         col, row = self.position
@@ -103,27 +96,43 @@ class Ghost:
         col, row = self.position
 
         options = [d for d in directions if maze.can_move(col, row, d)]
-        non_reverse = [d for d in options if d != _OPPOSITE[self.direction]]
-        return non_reverse or options
+
+        return options
 
     def _choose_direction(
-        self, options: list[Direction], player_position: tuple[int, int]
+        self, state: GameState, options: list[Direction]
     ) -> Direction:
         """PLACEHOLDER for step 2: random choice among valid options.
         Once this is confirmed working, this is the only method that
         changes to add real chase targeting (compare each option's
         resulting distance to player_position, pick the minimum).
         """
-        # TODO: Implement the direction decisions
-        # if self.behavior == GhostBehavior.CHASE: ...  # Chase the player
-        # elif self.behavior == GhostBehavior.FLEE: ... # Run away from the palyer
+        player_row, player_col = state.player.current_cell
+        player_position = player_col, player_row
+
+        ghost_col, ghost_row = self.position
+        distances: list[tuple[int, Direction]] = []
+
+        for option in options:
+            dx, dy = _DELTA[option]
+            neighbor = ghost_col + dx, ghost_row + dy
+
+            distance = state.maze.distance(neighbor, player_position)
+            if distance is not None:
+                distances.append((distance, option))
+
+        if not distances:
+            return random.choice(options)
+
+        if self.behavior == GhostBehavior.CHASE:
+            return min(distances, key=lambda item: item[0])[1]
+        elif self.behavior == GhostBehavior.FLEE:
+            return max(distances, key=lambda item: item[0])[1]
+
         return random.choice(options)
 
     def draw(
-        self,
-        screen: Surface,
-        state: GameState,
-        delta_time: float,
+        self, screen: Surface, state: GameState, animation_time: float
     ) -> None:
         sheet = pygame.image.load(
             f"assets/images/ghosts/{self.color.value}_ghost.png"
@@ -134,10 +143,13 @@ class Ghost:
             "assets/images/ghosts/scared_dark_ghost.png",
         ]
 
+        count = len(scared_ghost_themes)
+        scared_frame = (int(animation_time // 0.500)) % count
+        normal_frame = (int(animation_time // 0.150)) % 4
+
         if self.behavior == GhostBehavior.FLEE:
-            count = len(scared_ghost_themes)
             sheet = pygame.image.load(
-                scared_ghost_themes[(pygame.time.get_ticks() // 500) % count]
+                scared_ghost_themes[scared_frame]
             ).convert_alpha()
 
         col, row = self.position
@@ -157,9 +169,7 @@ class Ghost:
         frame_width = 32
         frame_height = 32
 
-        frame = (pygame.time.get_ticks() // 150) % 4
-
         sprite = sheet.subsurface(
-            (frame * frame_width, 0, frame_width, frame_height)
+            (normal_frame * frame_width, 0, frame_width, frame_height)
         )
         screen.blit(sprite, (screen_x, screen_y))

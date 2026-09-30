@@ -39,6 +39,10 @@ class GameState:
         self.time_remaining = 0.0
         self.super_pacgum_timer = 0.0
 
+    def respawn_all_ghosts(self):
+        for ghost in self.ghosts:
+            ghost.respawn()
+
     def update(self, delta_time: float):
         eaten = self.player.eat_current_cell()
 
@@ -50,7 +54,6 @@ class GameState:
 
             for ghost in self.ghosts:
                 ghost.set_behavior(GhostBehavior.FLEE)
-            # TODO: collision logic
             self.player.add_score(self.maze.config.points_per_super_pacgum)
 
         if self.super_pacgum_timer > 0:
@@ -64,10 +67,13 @@ class GameState:
         for ghost in self.ghosts:
             g_col, g_row = ghost.position_px
             difference = (abs(p_row-g_row), abs(p_col-g_col))
-            if difference[0] <= 16 and difference[1] <= 16:
+            if difference[0] <= 30 and difference[1] <= 30:
                 if ghost.behavior == GhostBehavior.FLEE:
                     ghost.respawn()
                 else:
-                   if self.player.lose_life():
-                       ...
-                   self.player.respawn()
+                    if self.player.lose_life():
+                        ...
+                    self.player.dead_counter = 120
+                    self.player.dead_position = self.player.position
+                    self.respawn_all_ghosts()
+                    self.player.respawn()

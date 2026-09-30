@@ -18,27 +18,47 @@ class Player:
         )
         self.respawn_position = self.position
         self.current_direction = None
+        self.dead_position : None | tuple[int, int] = None
         self.next_direction: None | Direction = None
         self.target: None | tuple[int, int] = None
         self.score = 0
+        self.dead_counter = 0
         self.lives = maze.config.lives
         self.acc = 0
 
-    def _get_current_frame(self) -> int:
-        if 0 <= self.acc <= 16:
-            return 0
-        if 16 < self.acc <= 32:
-            return 1
-        if 32 < self.acc <= 48:
-            return 2
+    def _get_current_frame(self, alive: bool) -> int:
+        if alive:
+            if 0 <= self.acc <= 16:
+                return 0
+            if 32 < self.acc <= 48:
+                return 2
+            else:
+                return 1
         else:
-            return 1
+            if 90 <= self.dead_counter <= 120:
+                return 0
+            if 60 <= self.dead_counter < 90:
+                return 1
+            if 30 <= self.dead_counter < 60:
+                return 2
+            if 0 < self.dead_counter < 30:
+                return 3
+        
+    def draw_die_state(self, screen: Surface):
+        path = "assets/images/pac-man"
+        frames = ["1.png", "2.png", "3.png", "4.png"]
+        current_frame = self._get_current_frame(False)
+        screen.blit(pygame.image.load(f"{path}_dead/{frames[current_frame]}").convert_alpha(), (self.dead_position))
 
     def draw(self, screen: Surface) -> None:
-        x_px, y_px = self.position
-        frames = ["1.png", "2.png", "3.png"]
-        current_frame = self._get_current_frame()
         path = "assets/images/pac-man"
+        if (self.dead_counter > 0):
+            self.draw_die_state(screen)
+            return
+        
+        frames = ["1.png", "2.png", "3.png"]
+        x_px, y_px = self.position
+        current_frame = self._get_current_frame(True)
         if self.current_direction == Direction.SOUTH:
             screen.blit(
                 pygame.image.load(

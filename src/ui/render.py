@@ -17,6 +17,7 @@ class Renderer:
         pygame.init()
         self.fps = fps
         self.delta_time = 0.0
+        self.animation_time = 0.0
         self.width = width
         self.height = height
         self._screen = pygame.display.set_mode((width, height))
@@ -51,6 +52,8 @@ class Renderer:
 
         while self._running:
             self.delta_time = clock.tick(self.fps) / 1000
+            self.animation_time += self.delta_time
+
             self._handle_events(state)
 
             if state.screen == Screen.PLAYING:
@@ -136,7 +139,7 @@ class Renderer:
 
     def _draw_ghosts(self, state: GameState) -> None:
         for ghost in state.ghosts:
-            ghost.draw(self._screen, state, self.delta_time)
+            ghost.draw(self._screen, state, self.animation_time)
 
     def _draw_menu(self) -> None:
         self._draw_title()

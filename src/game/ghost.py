@@ -123,7 +123,7 @@ class Ghost:
         self,
         screen: Surface,
         state: GameState,
-        delta_time: float,
+        animation_time: float,
     ) -> None:
         sheet = pygame.image.load(
             f"assets/images/ghosts/{self.color.value}_ghost.png"
@@ -134,10 +134,13 @@ class Ghost:
             "assets/images/ghosts/scared_dark_ghost.png",
         ]
 
+        count = len(scared_ghost_themes)
+        scared_frame = (int(animation_time // 0.500)) % count
+        normal_frame = (int(animation_time // 0.150)) % 4
+
         if self.behavior == GhostBehavior.FLEE:
-            count = len(scared_ghost_themes)
             sheet = pygame.image.load(
-                scared_ghost_themes[(pygame.time.get_ticks() // 500) % count]
+                scared_ghost_themes[scared_frame]
             ).convert_alpha()
 
         col, row = self.position
@@ -157,9 +160,7 @@ class Ghost:
         frame_width = 32
         frame_height = 32
 
-        frame = (pygame.time.get_ticks() // 150) % 4
-
         sprite = sheet.subsurface(
-            (frame * frame_width, 0, frame_width, frame_height)
+            (normal_frame * frame_width, 0, frame_width, frame_height)
         )
         screen.blit(sprite, (screen_x, screen_y))

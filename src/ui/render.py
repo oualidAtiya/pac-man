@@ -5,8 +5,8 @@ import pygame
 from src.game.direction import Direction
 from src.game.state import GameState, Screen
 from src.ui.button import Button
-
-
+from src.ui.hud import HUD
+from time import time
 class Renderer:
     """Owns the game window and drives the main event loop."""
 
@@ -25,6 +25,7 @@ class Renderer:
         self._running = False
         self._menu_buttons = self._build_menu_buttons()
         self._pause_buttons = self._build_pause_buttons()
+        self.hud = HUD()
 
     def _build_menu_buttons(self) -> dict[str, Button]:
         """Create and position the main menu's buttons, keyed by action name."""
@@ -66,13 +67,15 @@ class Renderer:
         """
         self._running = True
         clock = pygame.time.Clock()
-
+        frames = 0
         while self._running:
+            frames += 1
             self.delta_time = clock.tick(self.fps) / 1000
             self.animation_time += self.delta_time
-
+            if state.time_remaining > 0 and frames == 60:
+               state.time_remaining -= 1
+               frames = 0
             self._handle_events(state)
-
             if state.screen == Screen.PLAYING:
                 if state.player.dead_counter <= 0:
                     self.update(state)
@@ -176,6 +179,7 @@ class Renderer:
 
     def _draw_gameplay(self, state: GameState) -> None:
         self._draw_maze_pacgum(state)
+        self.hud.draw(self._screen, state)
         self._draw_player(state)
         self._draw_ghosts(state)
 

@@ -26,12 +26,12 @@ class Pacgum:
             (self.maze.width - 1, 0),
             (self.maze.width - 1, self.maze.height - 1),
         )
-        self.cell_positions = self.__set_allowed_positions()
+        self.cell_positions = self.__get_allowed_positions()
         self.pacgum_number = pacgum_number
         self.pac_gum_positions = self.__put_gums()
         self.super_pacgum_duration = super_pacgum_duration
 
-    def __set_allowed_positions(self):
+    def __get_allowed_positions(self):
         positions = []
         for y in range(self.maze.height):
             for x in range(self.maze.width):

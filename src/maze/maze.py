@@ -7,7 +7,6 @@ from src.config.models import GameConfig
 from src.game.direction import Direction
 from src.maze.adapter import MazeAdapter
 
-
 class Maze:
     def __init__(self, config: GameConfig) -> None:
         self.grid = MazeAdapter(config).generate_maze()
@@ -82,7 +81,7 @@ class Maze:
 
         x_px = self.offest_x
         y_px = self.offest_y
-
+        
         for y in range(self.height):
             for x in range(self.width):
                 cell = self.grid[y][x]

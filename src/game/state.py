@@ -36,7 +36,7 @@ class GameState:
         self.ghosts = ghosts
         self.pacgum = pacgum
         self.level = 1
-        self.time_remaining = 0.0
+        self.time_remaining = maze.config.level_max_time
         self.super_pacgum_timer = 0.0
 
     def respawn_all_ghosts(self):
@@ -45,7 +45,6 @@ class GameState:
 
     def update(self, delta_time: float):
         eaten = self.player.eat_current_cell()
-
         if eaten == PacgumType.NORMAL:
             self.player.add_score(self.maze.config.points_per_pacgum)
 
@@ -69,6 +68,7 @@ class GameState:
             difference = (abs(p_row-g_row), abs(p_col-g_col))
             if difference[0] <= 30 and difference[1] <= 30:
                 if ghost.behavior == GhostBehavior.FLEE:
+                    self.player.add_score(self.maze.config.points_per_ghost)
                     ghost.respawn()
                 else:
                     if self.player.lose_life():

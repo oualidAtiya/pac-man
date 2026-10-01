@@ -9,7 +9,7 @@ from src.game.state import GameState, Screen
 class Button:
     """A single menu button using pre-baked normal/hover/pressed images."""
 
-    def __init__(self, position: tuple[int, int], name: str) -> None:
+    def __init__(self, name: str) -> None:
         """`name` is the button's asset prefix, e.g. 'start' loads
         assets/start_normal.png, assets/start_hover.png, assets/start_pressed.png.
         """
@@ -45,14 +45,19 @@ class Button:
             return
 
         self.reset_state()
-        if self.name == "start":
-            state.screen = Screen.PLAYING
-        if self.name == "high_scores":
-            state.screen = Screen.HIGH_SCORES
-        if self.name == "instructions":
-            state.screen = Screen.INSTRUCTIONS
-        if self.name == "exit":
-            state.screen = Screen.EXIT
+        match self.name:
+            case "start":
+                state.screen = Screen.PLAYING
+            case "high_scores":
+                state.screen = Screen.HIGH_SCORES
+            case "instructions":
+                state.screen = Screen.INSTRUCTIONS
+            case "resume":
+                state.screen = Screen.PLAYING
+            case "back":
+                state.screen = Screen.MENU
+            case "exit":
+                state.screen = Screen.EXIT
 
     def draw(self, screen: Surface) -> None:
         screen.blit(self._images[self.state], self.rect)

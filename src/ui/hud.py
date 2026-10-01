@@ -9,12 +9,11 @@ class HUD:
         self.digits = {
             str(i): pygame.image.load(f"./assets/images/digits/{i}.png").convert_alpha() for i in range(10)
         }
-        self.high_score = pygame.image.load("./assets/images/high_score.png").convert_alpha()
-        self.level = pygame.image.load("./assets/images/level.png").convert_alpha()
-        self.live = pygame.image.load("./assets/images/live.png").convert_alpha()
-        self.score = pygame.image.load("./assets/images/score.png").convert_alpha()
-        self.time = pygame.image.load("./assets/images/time.png").convert_alpha()
-        self.super_gum_time = pygame.image.load("./assets/images/super_gum_time.png").convert_alpha()
+        self.level = pygame.image.load("./assets/images/hud/level.png").convert_alpha()
+        self.live = pygame.image.load("./assets/images/hud/live.png").convert_alpha()
+        self.score = pygame.image.load("./assets/images/hud/score.png").convert_alpha()
+        self.time = pygame.image.load("./assets/images/hud/time.png").convert_alpha()
+        self.super_gum_time = pygame.image.load("./assets/images/hud/super_gum_time.png").convert_alpha()
 
     def _draw_score(self, screen: Surface, score: int, corr: tuple[int, int]) -> None:
         x, y = corr

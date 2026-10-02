@@ -13,6 +13,7 @@ class Screen(Enum):
     PLAYING = auto()
     PAUSED = auto()
     GAME_OVER = auto()
+    VICTORY = auto()
     HIGH_SCORES = auto()
     INSTRUCTIONS = auto()
     EXIT = auto()
@@ -90,8 +91,8 @@ class GameState:
                     else:
                         if self.player.lose_life():
                             self.screen = Screen.GAME_OVER
-                            print("your lifes done.")
                             return
+
                         self.player.dead_counter = 120
                         self.player.dead_position = self.player.position
                         self.respawn_all_ghosts()

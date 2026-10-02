@@ -69,14 +69,14 @@ class Renderer:
         return buttons
 
     def is_lose(self, state: GameState) -> bool:
-        if state.time_remaining == 0:
-            return True
-        return False
+        return state.time_remaining == 0
 
     def is_win(self, state: GameState) -> bool:
-        if state.pacgum_counter == 0 and  state.level == 10 and state.time_remaining > 0:
-            return True
-        return False
+        return (
+            state.pacgum_counter == 0
+            and state.level == 10
+            and state.time_remaining > 0
+        )
 
     def run(self, state: GameState) -> None:
         """Run the main loop until a close condition is met.
@@ -89,15 +89,13 @@ class Renderer:
         while self._running:
             if self.is_lose(state):
                 state.screen = Screen.GAME_OVER
-                print("you lose time out.")
-                return
+
             if self.is_win(state):
-                state.screen = Screen.GAME_OVER
-                print("you win: reach level 10 with eat all pacgums and still time")
-                return
+                state.screen = Screen.VICTORY
+
             if state.time_remaining > 0 and frames == 60:
-               state.time_remaining -= 1
-               frames = 0
+                state.time_remaining -= 1
+                frames = 0
             self.delta_time = clock.tick(self.fps) / 1000
             self.animation_time += self.delta_time
             self._handle_events(state)
@@ -150,12 +148,13 @@ class Renderer:
                 state.screen = Screen.PLAYING
 
         elif state.screen == Screen.PLAYING and state.player.dead_counter <= 0:
-            if key == pygame.K_n:
-                state.next_level()
             if key == pygame.K_t:
                 state.time_remaining += 10
+            if key == pygame.K_w:
+                state.pacgum_counter = 0
             if key == pygame.K_c:
                 state.check_colission = not state.check_colission
+
             if key == pygame.K_DOWN:
                 state.player.request_move(Direction.SOUTH)
             if key == pygame.K_UP:
@@ -173,7 +172,9 @@ class Renderer:
             else:
                 char = event.unicode
                 if len(self.text_box.value) < self.text_box.max_chars:
-                    self.text_box.value += char if char.isalnum() or char == " " else ""
+                    self.text_box.value += (
+                        char if char.isalnum() or char == " " else ""
+                    )
 
     def _handle_mouse(
         self, state: GameState, event: pygame.event.Event
@@ -224,7 +225,7 @@ class Renderer:
             case Screen.GAME_OVER:
                 self._draw_game_over()
             case Screen.EXIT:
-                self._draw_victory()
+                self._running = False
 
         pygame.display.flip()
 
@@ -327,12 +328,6 @@ class Renderer:
         title_rect.centerx = self.width // 2
         title_rect.top += 192
         self._screen.blit(title, title_rect)
-
-        sub_title = pygame.image.load("assets/images/subtitle.png")
-        sub_title_rect = sub_title.get_rect()
-        sub_title_rect.centerx = self.width // 2
-        sub_title_rect.top += title_rect.height + 272
-        self._screen.blit(sub_title, sub_title_rect)
 
     def _shutdown(self) -> None:
         """Release pygame resources so no window or process is left hanging."""

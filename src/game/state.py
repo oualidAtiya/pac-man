@@ -13,6 +13,7 @@ class Screen(Enum):
     PLAYING = auto()
     PAUSED = auto()
     GAME_OVER = auto()
+    VICTORY = auto()
     HIGH_SCORES = auto()
     INSTRUCTIONS = auto()
     EXIT = auto()
@@ -65,7 +66,7 @@ class GameState:
         p_col, p_row = self.player.position
         for ghost in self.ghosts:
             g_col, g_row = ghost.position_px
-            difference = (abs(p_row-g_row), abs(p_col-g_col))
+            difference = (abs(p_row - g_row), abs(p_col - g_col))
             if difference[0] <= 30 and difference[1] <= 30:
                 if ghost.behavior == GhostBehavior.FLEE:
                     self.player.add_score(self.maze.config.points_per_ghost)

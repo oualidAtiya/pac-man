@@ -60,6 +60,16 @@ class Renderer:
 
         return buttons
 
+    def is_lose(self, state: GameState) -> bool:
+        if state.time_remaining == 0:
+            return True
+        return False
+
+    def is_win(self, state: GameState) -> bool:
+        if state.pacgum_counter == 0 and  state.level == 10 and state.time_remaining > 0:
+            return True
+        return False
+
     def run(self, state: GameState) -> None:
         """Run the main loop until a close condition is met.
 
@@ -69,12 +79,19 @@ class Renderer:
         clock = pygame.time.Clock()
         frames = 0
         while self._running:
-            frames += 1
-            self.delta_time = clock.tick(self.fps) / 1000
-            self.animation_time += self.delta_time
+            if self.is_lose(state):
+                state.screen = Screen.GAME_OVER
+                print("you lose time out.")
+                return
+            if self.is_win(state):
+                state.screen = Screen.GAME_OVER
+                print("you win: reach level 10 with eat all pacgums and still time")
+                return
             if state.time_remaining > 0 and frames == 60:
                state.time_remaining -= 1
                frames = 0
+            self.delta_time = clock.tick(self.fps) / 1000
+            self.animation_time += self.delta_time
             self._handle_events(state)
             if state.screen == Screen.PLAYING:
                 if state.player.dead_counter <= 0:
@@ -83,6 +100,7 @@ class Renderer:
                 else:
                     state.player.dead_counter -= 1
             self._draw(state)
+            frames += 1
 
         self._shutdown()
 

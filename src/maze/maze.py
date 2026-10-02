@@ -68,6 +68,10 @@ class Maze:
 
         return None
 
+    def regenerate_maze(self) -> None:
+        self.config.seed += 1
+        self.grid = MazeAdapter(self.config).generate_maze()
+
     def draw(self, screen: Surface) -> None:
         corners = {
             i: pygame.image.load(

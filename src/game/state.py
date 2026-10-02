@@ -37,24 +37,40 @@ class GameState:
         self.pacgum = pacgum
         self.level = 1
         self.time_remaining = maze.config.level_max_time
+        self.pacgum_counter = self.pacgum.pacgum_number
         self.super_pacgum_timer = 0.0
 
     def respawn_all_ghosts(self):
         for ghost in self.ghosts:
             ghost.respawn()
 
+    def next_level(self) -> None:
+        self.maze.regenerate_maze()
+        self.pacgum = Pacgum(self.maze)
+        self.respawn_all_ghosts()
+        self.player.respawn()
+        self.time_remaining = self.maze.config.level_max_time
+        self.super_pacgum_timer = 0.0
+        for ghost in self.ghosts:
+            ghost.set_behavior(GhostBehavior.CHASE)
+        if self.level < 10:
+            self.pacgum_counter = self.pacgum.pacgum_number
+            self.level += 1
+
     def update(self, delta_time: float):
         eaten = self.player.eat_current_cell()
         if eaten == PacgumType.NORMAL:
             self.player.add_score(self.maze.config.points_per_pacgum)
-
+            self.pacgum_counter -= 1
         elif eaten == PacgumType.SUPER:
             self.super_pacgum_timer = self.pacgum.super_pacgum_duration
-
             for ghost in self.ghosts:
                 ghost.set_behavior(GhostBehavior.FLEE)
             self.player.add_score(self.maze.config.points_per_super_pacgum)
 
+        if self.pacgum_counter == 0:
+            self.next_level()
+            return
         if self.super_pacgum_timer > 0:
             self.super_pacgum_timer -= delta_time
 
@@ -72,7 +88,9 @@ class GameState:
                     ghost.respawn()
                 else:
                     if self.player.lose_life():
-                        ...
+                        self.screen = Screen.GAME_OVER
+                        print("your lifes done.")
+                        return
                     self.player.dead_counter = 120
                     self.player.dead_position = self.player.position
                     self.respawn_all_ghosts()

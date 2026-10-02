@@ -160,7 +160,7 @@ class Player:
         return None
             
 
-    def respawn(self):
+    def respawn(self) -> None:
         self.current_cell = (self.height//2, self.width//2)
         self.position = self.respawn_position
         self.acc = 0
@@ -174,5 +174,5 @@ class Player:
             return True
         return False
 
-    def add_score(self, score):
+    def add_score(self, score: int) -> None:
         self.score += score

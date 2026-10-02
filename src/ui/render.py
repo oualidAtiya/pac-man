@@ -68,16 +68,6 @@ class Renderer:
 
         return buttons
 
-    def is_lose(self, state: GameState) -> bool:
-        return state.time_remaining == 0
-
-    def is_win(self, state: GameState) -> bool:
-        return (
-            state.pacgum_counter == 0
-            and state.level == 10
-            and state.time_remaining > 0
-        )
-
     def run(self, state: GameState) -> None:
         """Run the main loop until a close condition is met.
 
@@ -87,10 +77,10 @@ class Renderer:
         clock = pygame.time.Clock()
         frames = 0
         while self._running:
-            if self.is_lose(state):
+            if state.player.is_lose(state):
                 state.screen = Screen.GAME_OVER
 
-            if self.is_win(state):
+            if state.player.is_win(state):
                 state.screen = Screen.VICTORY
 
             if state.time_remaining > 0 and frames == 60:
@@ -151,7 +141,7 @@ class Renderer:
             if key == pygame.K_t:
                 state.time_remaining += 10
             if key == pygame.K_w:
-                state.pacgum_counter = 0
+                state.pacgum.pacgum_counter = 0
             if key == pygame.K_c:
                 state.check_colission = not state.check_colission
 

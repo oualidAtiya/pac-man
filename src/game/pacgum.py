@@ -16,18 +16,19 @@ class Pacgum:
     def __init__(
         self,
         maze: Maze,
-        pacgum_number: int = 80,
+        pacgum_number: int = 1,
         super_pacgum_duration: int = 10,
     ) -> None:
         self.maze = maze
         self.super_gum_positions = (
             (0, 0),
-            (0, self.maze.height - 1),
-            (self.maze.width - 1, 0),
-            (self.maze.width - 1, self.maze.height - 1),
+            (self.maze.height - 1, 0),
+            (0, self.maze.width - 1),
+            (self.maze.height - 1, self.maze.width - 1),
         )
         self.cell_positions = self.__get_allowed_positions()
         self.pacgum_number = pacgum_number
+        self.pacgum_counter = pacgum_number
         self.pac_gum_positions = self.__put_gums()
         self.super_pacgum_duration = super_pacgum_duration
 
@@ -48,12 +49,12 @@ class Pacgum:
         for y, x in self.pac_gum_positions:
             cell = self.maze.grid[y][x]
             if cell.has_pacgum:
-                screen.blit(gum, cell.gum_position)
+                screen.blit(gum, cell.content_position_px)
 
         for y, x in self.super_gum_positions:
             cell = self.maze.grid[y][x]
             if cell.has_super_pacgum:
-                screen.blit(super_gum, cell.gum_position)
+                screen.blit(super_gum, cell.content_position_px)
 
     def __put_gums(self) -> None:
         positions = []

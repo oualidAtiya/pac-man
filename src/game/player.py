@@ -1,6 +1,6 @@
 import pygame
 from pygame import Surface
-
+from src.game.state import GameState
 from src.game.direction import Direction
 from src.maze.maze import Maze
 
@@ -11,11 +11,9 @@ class Player:
         self.height = maze.config.height
         self.width = maze.config.width
         self.maze = maze
-        self.current_cell = (self.height // 2, self.width // 2)
-        self.position = (
-            (maze.width_maze_px // 2) + maze.offest_x,
-            (maze.height_maze_px // 2) + maze.offest_y,
-        )
+        self.start_cell = (self.height // 2, self.width // 2-1) if self.height % 2 == 0 else (self.height // 2, self.width // 2)
+        self.current_cell = self.start_cell
+        self.position = maze.grid[self.start_cell[0]][self.start_cell[1]].content_position_px
         self.respawn_position = self.position
         self.current_direction = None
         self.dead_position : None | tuple[int, int] = None
@@ -25,6 +23,16 @@ class Player:
         self.dead_counter = 0
         self.lives = maze.config.lives
         self.acc = 0
+
+    def is_lose(self, state: GameState) -> bool:
+        return state.time_remaining == 0
+
+    def is_win(self, state: GameState) -> bool:
+        return (
+            state.pacgum.pacgum_counter == 0
+            and state.level == 10
+            and state.time_remaining > 0
+        )
 
     def _get_current_frame(self, alive: bool) -> int:
         if alive:
@@ -161,7 +169,7 @@ class Player:
             
 
     def respawn(self) -> None:
-        self.current_cell = (self.height//2, self.width//2)
+        self.current_cell = self.start_cell
         self.position = self.respawn_position
         self.acc = 0
         self.target = None

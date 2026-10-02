@@ -18,6 +18,7 @@ class Maze:
         self.height_maze_px = (32 * config.height + 1) + (32 * config.height)
         self.offest_x = (2000 // 2) - (self.width * 32)
         self.offest_y = (1500 // 2) - (self.height * 32)
+        self.set_cells_positions()
 
     def can_move(self, col: int, row: int, direction: Direction) -> bool:
         if direction == Direction.NORTH:
@@ -72,6 +73,18 @@ class Maze:
     def regenerate_maze(self) -> None:
         self.config.seed += 1
         self.grid = MazeAdapter(self.config).generate_maze()
+        self.set_cells_positions()
+
+    def set_cells_positions(self) -> None:
+        x_px = self.offest_x
+        y_px = self.offest_y
+        for y in range(self.height):
+            for x in range(self.width):
+                cell = self.grid[y][x]
+                cell.content_position_px = (x_px + 32, y_px + 32)
+                x_px += 32 * 2
+            y_px += 32 * 2
+            x_px = self.offest_x
 
     def draw(self, screen: Surface) -> None:
         corners = {
@@ -80,9 +93,7 @@ class Maze:
             ).convert_alpha()
             for i in range(1, 17)
         }
-
-        corner_rect = corners[1].get_rect()
-        cell_width = corner_rect.width
+        cell_width = 32
 
         x_px = self.offest_x
         y_px = self.offest_y
@@ -90,7 +101,6 @@ class Maze:
         for y in range(self.height):
             for x in range(self.width):
                 cell = self.grid[y][x]
-                cell.gum_position = (x_px + 32, y_px + 32)
                 west_cell = None
                 north_cell = None
                 east_cell = None

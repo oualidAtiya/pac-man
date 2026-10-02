@@ -7,7 +7,8 @@ class Cell:
         self.south = (cell_value & 4) != 0
         self.west = (cell_value & 8) != 0
         self.is_42 = cell_value == 15
-        self.gum_position = (0, 0)
+        self.content_position_px = None
+        # self.gum_position = (0, 0)
         self.has_pacgum = False
         self.has_super_pacgum=  False
 

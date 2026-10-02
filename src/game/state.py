@@ -1,8 +1,13 @@
+from __future__ import annotations
 from enum import Enum, auto
 
 from src.game.ghost import Ghost, GhostBehavior
 from src.game.pacgum import Pacgum
-from src.game.player import PacgumType, Player
+from src.game.pacgum import PacgumType
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from src.game.player import Player
 from src.maze.maze import Maze
 
 
@@ -38,7 +43,6 @@ class GameState:
         self.pacgum = pacgum
         self.level = 1
         self.time_remaining = maze.config.level_max_time
-        self.pacgum_counter = self.pacgum.pacgum_number
         self.super_pacgum_timer = 0.0
         self.check_colission = True
 
@@ -58,7 +62,7 @@ class GameState:
         self.player.respawn()
         self.time_remaining = self.maze.config.level_max_time
         self.super_pacgum_timer = 0.0
-        self.pacgum_counter = self.pacgum.pacgum_number
+        self.pacgum.pacgum_counter = self.pacgum.pacgum_number
 
         for ghost in self.ghosts:
             ghost.set_behavior(GhostBehavior.CHASE)
@@ -67,14 +71,14 @@ class GameState:
         eaten = self.player.eat_current_cell()
         if eaten == PacgumType.NORMAL:
             self.player.add_score(self.maze.config.points_per_pacgum)
-            self.pacgum_counter -= 1
+            self.pacgum.pacgum_counter -= 1
         elif eaten == PacgumType.SUPER:
             self.super_pacgum_timer = self.pacgum.super_pacgum_duration
             for ghost in self.ghosts:
                 ghost.set_behavior(GhostBehavior.FLEE)
             self.player.add_score(self.maze.config.points_per_super_pacgum)
 
-        if self.pacgum_counter == 0:
+        if self.pacgum.pacgum_counter == 0:
             self.next_level()
             return
         if self.super_pacgum_timer > 0:

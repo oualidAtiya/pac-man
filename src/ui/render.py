@@ -140,6 +140,12 @@ class Renderer:
                 state.screen = Screen.PLAYING
 
         elif state.screen == Screen.PLAYING and state.player.dead_counter <= 0:
+            if key == pygame.K_n:
+                state.next_level()
+            if key == pygame.K_t:
+                state.time_remaining += 10
+            if key == pygame.K_c:
+                state.check_colission = not state.check_colission
             if key == pygame.K_DOWN:
                 state.player.request_move(Direction.SOUTH)
             if key == pygame.K_UP:

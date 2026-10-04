@@ -16,9 +16,9 @@ def main():
             player=Player(maze),
             ghosts=[
                 Ghost((0, 0), GhostColor.RED),
-                Ghost((maze.width - 1, 0), GhostColor.BLUE),
-                Ghost((0, maze.height - 1), GhostColor.PINK),
-                Ghost((maze.width - 1, maze.height - 1), GhostColor.ORANGE),
+                Ghost((maze.config.width - 1, 0), GhostColor.BLUE),
+                Ghost((0, maze.config.height - 1), GhostColor.PINK),
+                Ghost((maze.config.width - 1, maze.config.height - 1), GhostColor.ORANGE),
             ],
             pacgum=Pacgum(maze)
         )

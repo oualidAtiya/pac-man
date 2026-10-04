@@ -55,7 +55,7 @@ class Button:
             case "resume":
                 state.screen = Screen.PLAYING
             case "back":
-                state.reset()
+                state.reset(False)
                 state.screen = Screen.MENU
             case "exit":
                 state.screen = Screen.EXIT

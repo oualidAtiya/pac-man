@@ -42,15 +42,20 @@ class Ghost:
     """A single ghost entity."""
 
     def __init__(self, position: tuple[int, int], color: GhostColor) -> None:
-        self.position = position  # (col, row)
-        self.spawn_position = position
+        self.position: tuple[int, int] | None = None
+        self.spawn_position: tuple[int, int] | None = None
+        self.set_position(position)
         self.direction = Direction.NORTH
         self.behavior = GhostBehavior.CHASE
-        self.color = color  # identifies which corner it spawned in
+        self.color = color
         self.position_px = (0, 0)
         self.target: tuple[int, int] | None = None
         self.progress = 0
         self.speed = 2
+
+    def set_position(self, position: tuple[int, int]) -> None:
+        self.position = position
+        self.spawn_position = position
 
     @property
     def is_edible(self) -> bool:

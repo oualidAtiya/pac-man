@@ -12,26 +12,35 @@ class Maze:
     def __init__(self, config: GameConfig) -> None:
         self.grid = MazeAdapter(config).generate_maze()
         self.config = config
-        self.width = config.width
-        self.height = config.height
-        self.width_maze_px = (32 * config.width + 1) + (32 * config.width)
-        self.height_maze_px = (32 * config.height + 1) + (32 * config.height)
-        self.offest_x = (2000 // 2) - (self.width * 32)
-        self.offest_y = (1500 // 2) - (self.height * 32)
+        self.width_maze_px = None
+        self.height_maze_px = None
+        self.offest_x = None
+        self.offest_y = None
+        self.set_height_width_px()
+        self.set_offests()
         self.set_cells_positions()
+
+
+    def set_height_width_px(self) -> None:
+        self.width_maze_px = (32 * self.config.width + 1) + (32 * self.config.width)
+        self.height_maze_px = (32 * self.config.height + 1) + (32 * self.config.height)
+
+    def set_offests(self) -> None:
+        self.offest_x = (2000 // 2) - (self.config.width * 32)
+        self.offest_y = (1500 // 2) - (self.config.height * 32)
 
     def can_move(self, col: int, row: int, direction: Direction) -> bool:
         if direction == Direction.NORTH:
             return row - 1 >= 0 and not self.grid[row][col].north
 
         if direction == Direction.SOUTH:
-            return row + 1 < self.height and not self.grid[row][col].south
+            return row + 1 < self.config.height and not self.grid[row][col].south
 
         if direction == Direction.WEST:
             return col - 1 >= 0 and not self.grid[row][col].west
 
         if direction == Direction.EAST:
-            return col + 1 < self.width and not self.grid[row][col].east
+            return col + 1 < self.config.width and not self.grid[row][col].east
 
     def distance(
         self,
@@ -70,16 +79,20 @@ class Maze:
 
         return None
 
-    def regenerate_maze(self) -> None:
-        self.config.seed += 1
+    def regenerate_maze(self, next_level: bool) -> None:
+        if next_level:
+            self.config.width += 1
+            self.config.height += 1
         self.grid = MazeAdapter(self.config).generate_maze()
+        self.set_height_width_px()
+        self.set_offests()
         self.set_cells_positions()
 
     def set_cells_positions(self) -> None:
         x_px = self.offest_x
         y_px = self.offest_y
-        for y in range(self.height):
-            for x in range(self.width):
+        for y in range(self.config.height):
+            for x in range(self.config.width):
                 cell = self.grid[y][x]
                 cell.content_position_px = (x_px + 32, y_px + 32)
                 x_px += 32 * 2
@@ -98,8 +111,8 @@ class Maze:
         x_px = self.offest_x
         y_px = self.offest_y
 
-        for y in range(self.height):
-            for x in range(self.width):
+        for y in range(self.config.height):
+            for x in range(self.config.width):
                 cell = self.grid[y][x]
                 west_cell = None
                 north_cell = None
@@ -109,9 +122,9 @@ class Maze:
                     west_cell = self.grid[y][x - 1]
                 if y > 0:
                     north_cell = self.grid[y - 1][x]
-                if x < self.width - 1:
+                if x < self.config.width - 1:
                     east_cell = self.grid[y][x + 1]
-                if y < self.height - 1:
+                if y < self.config.height - 1:
                     south_cell = self.grid[y + 1][x]
 
                 screen.blit(

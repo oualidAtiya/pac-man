@@ -52,17 +52,22 @@ class GameState:
 
     def next_level(self) -> None:
         if self.level < 10:
-            self.reset()
+            self.reset(True)
             self.level += 1
 
-    def reset(self) -> None:
-        self.maze.regenerate_maze()
-        self.pacgum = Pacgum(self.maze)
-        self.respawn_all_ghosts()
+    def reset(self, next_level: bool) -> None:
+        self.maze.regenerate_maze(next_level)
+        self.player.maze = self.maze
+        self.player.set_attr()
         self.player.respawn()
+        self.pacgum = Pacgum(self.maze)
+        self.ghosts[0].set_position((0, 0))
+        self.ghosts[1].set_position((self.maze.config.width - 1, 0))
+        self.ghosts[2].set_position((0, self.maze.config.height - 1))
+        self.ghosts[3].set_position((self.maze.config.width - 1, self.maze.config.height - 1))
+        self.respawn_all_ghosts()
         self.time_remaining = self.maze.config.level_max_time
         self.super_pacgum_timer = 0.0
-        self.pacgum.pacgum_counter = self.pacgum.pacgum_number
 
         for ghost in self.ghosts:
             ghost.set_behavior(GhostBehavior.CHASE)

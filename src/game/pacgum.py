@@ -22,9 +22,9 @@ class Pacgum:
         self.maze = maze
         self.super_gum_positions = (
             (0, 0),
-            (self.maze.height - 1, 0),
-            (0, self.maze.width - 1),
-            (self.maze.height - 1, self.maze.width - 1),
+            (self.maze.config.height - 1, 0),
+            (0, self.maze.config.width - 1),
+            (self.maze.config.height - 1, self.maze.config.width - 1),
         )
         self.cell_positions = self.__get_allowed_positions()
         self.pacgum_number = pacgum_number
@@ -34,8 +34,8 @@ class Pacgum:
 
     def __get_allowed_positions(self):
         positions = []
-        for y in range(self.maze.height):
-            for x in range(self.maze.width):
+        for y in range(self.maze.config.height):
+            for x in range(self.maze.config.width):
                 cell = self.maze.grid[y][x]
                 if not cell.is_42 and (y, x) not in self.super_gum_positions:
                     positions.append((y, x))

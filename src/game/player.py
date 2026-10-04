@@ -8,13 +8,11 @@ from src.game.pacgum import PacgumType
 
 class Player:
     def __init__(self, maze: Maze) -> None:
-        self.height = maze.config.height
-        self.width = maze.config.width
         self.maze = maze
-        self.start_cell = (self.height // 2, self.width // 2-1) if self.height % 2 == 0 else (self.height // 2, self.width // 2)
-        self.current_cell = self.start_cell
-        self.position = maze.grid[self.start_cell[0]][self.start_cell[1]].content_position_px
-        self.respawn_position = self.position
+        self.start_cell = None
+        self.current_cell = None
+        self.position = None
+        self.respawn_position = None
         self.current_direction = None
         self.dead_position : None | tuple[int, int] = None
         self.next_direction: None | Direction = None
@@ -23,6 +21,16 @@ class Player:
         self.dead_counter = 0
         self.lives = maze.config.lives
         self.acc = 0
+        self.set_attr()
+
+    def set_attr(self) -> None:
+        if (self.maze.config.height % 2 == 0):
+            self.start_cell = (self.maze.config.height // 2, self.maze.config.width // 2-1)
+        else:
+            self.start_cell = (self.maze.config.height // 2, self.maze.config.width // 2)
+        self.current_cell = self.start_cell
+        self.position = self.maze.grid[self.start_cell[0]][self.start_cell[1]].content_position_px
+        self.respawn_position = self.position
 
     def is_lose(self, state: GameState) -> bool:
         return state.time_remaining == 0
@@ -128,24 +136,24 @@ class Player:
         y, x = self.current_cell
         if direction == Direction.SOUTH:
             if (
-                0 <= y + 1 <= self.height - 1
+                0 <= y + 1 <= self.maze.config.height - 1
                 and not self.maze.grid[y][x].south
             ):
                 return (y + 1, x)
             return None
         elif direction == Direction.NORTH:
             if (
-                0 <= y - 1 <= self.height - 1
+                0 <= y - 1 <= self.maze.config.height - 1
                 and not self.maze.grid[y][x].north
             ):
                 return (y - 1, x)
             return None
         elif direction == Direction.EAST:
-            if 0 <= x + 1 <= self.width - 1 and not self.maze.grid[y][x].east:
+            if 0 <= x + 1 <= self.maze.config.width - 1 and not self.maze.grid[y][x].east:
                 return (y, x + 1)
             return None
         elif direction == Direction.WEST:
-            if 0 <= x - 1 <= self.width - 1 and not self.maze.grid[y][x].west:
+            if 0 <= x - 1 <= self.maze.config.width - 1 and not self.maze.grid[y][x].west:
                 return (y, x - 1)
             return None
 

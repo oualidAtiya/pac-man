@@ -47,6 +47,7 @@ class Button:
         self.reset_state()
         match self.name:
             case "start":
+                state.reset(False)
                 state.screen = Screen.PLAYING
             case "high_scores":
                 state.screen = Screen.HIGH_SCORES
@@ -55,7 +56,6 @@ class Button:
             case "resume":
                 state.screen = Screen.PLAYING
             case "back":
-                state.reset(False)
                 state.screen = Screen.MENU
             case "exit":
                 state.screen = Screen.EXIT

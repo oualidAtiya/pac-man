@@ -5,14 +5,14 @@ import re
 
 
 class GameConfig(BaseModel):
-    width: int = 15
-    height: int = 15
-    lives: int = 10
-    seed: int = 10
-    level_max_time: int = 10
+    width: int = 10
+    height: int = 10
+    lives: int = 5
+    seed: int = 42
+    level_max_time: int = 60
     points_per_pacgum: int = 10
-    points_per_super_pacgum: int = 10
-    points_per_ghost: int = 10
+    points_per_super_pacgum: int = 20
+    points_per_ghost: int = 30
     highscore_filename: str = 'highscores.json'
 
     @model_validator(mode="before")

@@ -12,6 +12,7 @@ class Maze:
     def __init__(self, config: GameConfig) -> None:
         self.grid = MazeAdapter(config).generate_maze()
         self.config = config
+        self.default = config.height, config.width
         self.width_maze_px = None
         self.height_maze_px = None
         self.offest_x = None
@@ -83,6 +84,9 @@ class Maze:
         if next_level:
             self.config.width += 1
             self.config.height += 1
+        else:
+            self.config.height = self.default[0]
+            self.config.width = self.default[1]
         self.grid = MazeAdapter(self.config).generate_maze()
         self.set_height_width_px()
         self.set_offests()

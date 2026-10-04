@@ -1,13 +1,11 @@
 
 {
 
-    "lives":4,
-    "seed": 4,
-    "level_max_time": 5,
-    "width": 10,
-    "height": 10,
-    # Scoring System Points
-    "points_per_pacgum": 10,
-    "points_per_super_pacgum": 50,#comment
-    "points_per_ghost": 200
+    "lives":3,
+    "seed": 96,
+    "points_per_pacgum": 1000,
+    "points_per_super_pacgum": 50,
+    "points_per_ghost": 200,
+    "super_gum_time": 60,
+    "level_max_time": 5
 }

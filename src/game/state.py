@@ -56,6 +56,10 @@ class GameState:
             self.level += 1
 
     def reset(self, next_level: bool) -> None:
+        if not next_level:
+            self.level = 1
+            self.player.score = 0
+            self.player.lives = self.maze.config.lives
         self.maze.regenerate_maze(next_level)
         self.player.maze = self.maze
         self.player.set_attr()
@@ -106,8 +110,9 @@ class GameState:
                     else:
                         if self.player.lose_life():
                             self.screen = Screen.GAME_OVER
-                            return
+                            break
                         self.player.dead_counter = 120
                         self.player.dead_position = self.player.position
                         self.respawn_all_ghosts()
                         self.player.respawn()
+                        break

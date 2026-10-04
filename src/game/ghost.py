@@ -54,6 +54,7 @@ class Ghost:
         self.speed = 2
 
     def set_position(self, position: tuple[int, int]) -> None:
+        self.position_px = (0, 0)
         self.position = position
         self.spawn_position = position
 

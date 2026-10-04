@@ -7,7 +7,7 @@ from src.game.state import GameState, Screen
 from src.ui.button import Button
 from src.ui.hud import HUD
 from src.ui.text_box import TextBox
-
+from src.game.ghost import GhostBehavior
 
 class Renderer:
     """Owns the game window and drives the main event loop."""
@@ -96,6 +96,7 @@ class Renderer:
             self.check_time(state)
             if state.player.is_win(state):
                 state.screen = Screen.VICTORY
+                state.level = 1
 
             self.delta_time = clock.tick(self.fps) / 1000
             self.animation_time += self.delta_time
@@ -145,8 +146,9 @@ class Renderer:
             ):
                 state.screen = Screen.MENU
 
-        elif state.screen == Screen.MENU:
+        if state.screen == Screen.MENU:
             if key == pygame.K_RETURN:
+                state.reset(False)
                 state.screen = Screen.PLAYING
 
         elif state.screen == Screen.PLAYING and state.player.dead_counter <= 0:
@@ -156,6 +158,9 @@ class Renderer:
                 state.pacgum.pacgum_counter = 0
             if key == pygame.K_c:
                 state.check_colission = not state.check_colission
+            if key == pygame.K_s:
+                for ghost in state.ghosts:
+                    ghost.set_behavior(GhostBehavior.FLEE)
 
             if key == pygame.K_DOWN:
                 state.player.request_move(Direction.SOUTH)
@@ -169,6 +174,10 @@ class Renderer:
         elif (
             state.screen == Screen.VICTORY or state.screen == Screen.GAME_OVER
         ):
+            if key == pygame.K_RETURN and self.text_box.value and not self.text_box.value.isspace():
+                # saving..
+                state.screen = Screen.MENU
+                # state.time_remaining = 0
             if key == pygame.K_BACKSPACE:
                 self.text_box.value = self.text_box.value[:-1]
             else:

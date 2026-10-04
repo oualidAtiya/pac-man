@@ -31,6 +31,7 @@ class Player:
         self.current_cell = self.start_cell
         self.position = self.maze.grid[self.start_cell[0]][self.start_cell[1]].content_position_px
         self.respawn_position = self.position
+        self.dead_counter = 0
 
     def is_time_out(self, state: GameState) -> bool:
         return state.time_remaining == 0

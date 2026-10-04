@@ -107,7 +107,6 @@ class GameState:
                         if self.player.lose_life():
                             self.screen = Screen.GAME_OVER
                             return
-
                         self.player.dead_counter = 120
                         self.player.dead_position = self.player.position
                         self.respawn_all_ghosts()

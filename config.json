@@ -1,9 +1,9 @@
 
 {
 
-    "lives": 3,
-    "seed": 55,
-    "level_max_time": 10,
+    "lives":4,
+    "seed": 4,
+    "level_max_time": 5,
     "width": 10,
     "height": 10,
     # Scoring System Points

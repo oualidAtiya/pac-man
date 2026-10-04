@@ -29,7 +29,7 @@ class Renderer:
         self._running = False
         self.delta_time = 0.0
         self.animation_time = 0.0
-
+        self.current_frame = 0
         self._menu_buttons = self._build_menu_buttons()
         self._pause_buttons = self._build_pause_buttons()
         self.text_box = TextBox(self._screen)
@@ -68,6 +68,23 @@ class Renderer:
 
         return buttons
 
+    def handle_delay(self, state) -> None:
+        if state.time_remaining > 0 and self.current_frame == 60:
+            state.time_remaining -= 1
+            self.current_frame = 0
+        self.current_frame += 1
+
+    def check_time(self, state) -> None:
+        if state.player.is_time_out(state):
+            if state.player.lose_life():
+                state.screen = Screen.GAME_OVER
+                return
+            state.player.dead_counter = 120
+            state.player.dead_position = state.player.position
+            state.respawn_all_ghosts()
+            state.player.respawn()
+            state.time_remaining =  state.maze.config.level_max_time
+
     def run(self, state: GameState) -> None:
         """Run the main loop until a close condition is met.
 
@@ -75,30 +92,23 @@ class Renderer:
         """
         self._running = True
         clock = pygame.time.Clock()
-        frames = 0
         while self._running:
-            if state.player.is_time_out(state):
-                if state.player.lose_life():
-                    state.screen = Screen.GAME_OVER
-                else:
-                    state.reset(False)
+            self.check_time(state)
             if state.player.is_win(state):
                 state.screen = Screen.VICTORY
 
-            if state.time_remaining > 0 and frames == 60:
-                state.time_remaining -= 1
-                frames = 0
             self.delta_time = clock.tick(self.fps) / 1000
             self.animation_time += self.delta_time
             self._handle_events(state)
+    
             if state.screen == Screen.PLAYING:
                 if state.player.dead_counter <= 0:
+                    self.handle_delay(state)
                     self.update(state)
                     state.update(self.delta_time)
                 else:
                     state.player.dead_counter -= 1
             self._draw(state)
-            frames += 1
 
         self._shutdown()
 

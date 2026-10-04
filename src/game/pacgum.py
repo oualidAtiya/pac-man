@@ -16,7 +16,6 @@ class Pacgum:
     def __init__(
         self,
         maze: Maze,
-        pacgum_number: int = 1,
         super_pacgum_duration: int = 10,
     ) -> None:
         self.maze = maze
@@ -27,8 +26,8 @@ class Pacgum:
             (self.maze.config.height - 1, self.maze.config.width - 1),
         )
         self.cell_positions = self.__get_allowed_positions()
-        self.pacgum_number = pacgum_number
-        self.pacgum_counter = pacgum_number
+        self.pacgum_number = int((self.maze.config.width * self.maze.config.height) * 0.50)
+        self.pacgum_counter = self.pacgum_number
         self.pac_gum_positions = self.__put_gums()
         self.super_pacgum_duration = super_pacgum_duration
 

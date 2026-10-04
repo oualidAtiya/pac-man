@@ -3,7 +3,7 @@ from pygame import Surface
 from src.game.state import GameState
 from src.game.direction import Direction
 from src.maze.maze import Maze
-
+from src.game.state import Screen
 from src.game.pacgum import PacgumType
 
 class Player:
@@ -175,7 +175,6 @@ class Player:
             return PacgumType.NORMAL
         return None
             
-
     def respawn(self) -> None:
         self.current_cell = self.start_cell
         self.position = self.respawn_position

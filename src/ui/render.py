@@ -77,9 +77,11 @@ class Renderer:
         clock = pygame.time.Clock()
         frames = 0
         while self._running:
-            if state.player.is_lose(state):
-                state.screen = Screen.GAME_OVER
-
+            if state.player.is_time_out(state):
+                if state.player.lose_life():
+                    state.screen = Screen.GAME_OVER
+                else:
+                    state.reset(False)
             if state.player.is_win(state):
                 state.screen = Screen.VICTORY
 

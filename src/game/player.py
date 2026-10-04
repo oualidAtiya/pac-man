@@ -32,7 +32,7 @@ class Player:
         self.position = self.maze.grid[self.start_cell[0]][self.start_cell[1]].content_position_px
         self.respawn_position = self.position
 
-    def is_lose(self, state: GameState) -> bool:
+    def is_time_out(self, state: GameState) -> bool:
         return state.time_remaining == 0
 
     def is_win(self, state: GameState) -> bool:
@@ -186,9 +186,7 @@ class Player:
 
     def lose_life(self) -> bool:
         self.lives -= 1
-        if self.lives == 0:
-            return True
-        return False
+        return self.lives == 0
 
     def add_score(self, score: int) -> None:
         self.score += score

@@ -1,13 +1,15 @@
 """Owns the game window and the main loop."""
 
 import pygame
+from pygame.rect import Rect
 
 from src.game.direction import Direction
+from src.game.ghost import GhostBehavior
 from src.game.state import GameState, Screen
 from src.ui.button import Button
 from src.ui.hud import HUD
 from src.ui.text_box import TextBox
-from src.game.ghost import GhostBehavior
+
 
 class Renderer:
     """Owns the game window and drives the main event loop."""
@@ -78,12 +80,13 @@ class Renderer:
         if state.player.is_time_out(state):
             if state.player.lose_life():
                 state.screen = Screen.GAME_OVER
+                self.text_box.reset()
                 return
             state.player.dead_counter = 120
             state.player.dead_position = state.player.position
             state.respawn_all_ghosts()
             state.player.respawn()
-            state.time_remaining =  state.maze.config.level_max_time
+            state.time_remaining = state.maze.config.level_max_time
 
     def run(self, state: GameState) -> None:
         """Run the main loop until a close condition is met.
@@ -96,17 +99,18 @@ class Renderer:
             self.check_time(state)
             if state.player.is_win(state):
                 state.screen = Screen.VICTORY
+                self.text_box.reset()
                 state.level = 1
 
             self.delta_time = clock.tick(self.fps) / 1000
             self.animation_time += self.delta_time
             self._handle_events(state)
-    
+
             if state.screen == Screen.PLAYING:
                 if state.player.dead_counter <= 0:
                     self.handle_delay(state)
                     self.update(state)
-                    state.update(self.delta_time)
+                    state.update(self.delta_time, self.text_box)
                 else:
                     state.player.dead_counter -= 1
             self._draw(state)
@@ -140,10 +144,7 @@ class Renderer:
                 state.screen = Screen.PAUSED
             elif state.screen == Screen.PAUSED:
                 state.screen = Screen.PLAYING
-            elif (
-                state.screen == Screen.INSTRUCTIONS
-                or state.screen == Screen.HIGH_SCORES
-            ):
+            else:
                 state.screen = Screen.MENU
 
         if state.screen == Screen.MENU:
@@ -174,18 +175,20 @@ class Renderer:
         elif (
             state.screen == Screen.VICTORY or state.screen == Screen.GAME_OVER
         ):
-            if key == pygame.K_RETURN and self.text_box.value and not self.text_box.value.isspace():
-                # saving..
+            if (
+                key == pygame.K_RETURN
+                and not self.text_box.value.isspace()
+                and self.text_box.value
+            ):
+                # TODO: save the player score
                 state.screen = Screen.MENU
-                # state.time_remaining = 0
-            if key == pygame.K_BACKSPACE:
-                self.text_box.value = self.text_box.value[:-1]
+
+            elif key == pygame.K_BACKSPACE:
+                self.text_box.remove_char()
+
             else:
                 char = event.unicode
-                if len(self.text_box.value) < self.text_box.max_chars:
-                    self.text_box.value += (
-                        char if char.isalnum() or char == " " else ""
-                    )
+                self.text_box.add_char(char)
 
     def _handle_mouse(
         self, state: GameState, event: pygame.event.Event
@@ -232,9 +235,9 @@ class Renderer:
             case Screen.INSTRUCTIONS:
                 self._draw_instructions()
             case Screen.VICTORY:
-                self._draw_victory()
+                self._draw_victory(state)
             case Screen.GAME_OVER:
-                self._draw_game_over()
+                self._draw_game_over(state)
             case Screen.EXIT:
                 self._running = False
 
@@ -297,7 +300,7 @@ class Renderer:
         for ghost in state.ghosts:
             ghost.draw(self._screen, state, self.animation_time)
 
-    def _draw_victory(self) -> None:
+    def _draw_victory(self, state: GameState) -> None:
         victory = pygame.image.load("assets/images/screens/victory.png")
         victory_rect = victory.get_rect()
         position = (
@@ -305,14 +308,14 @@ class Renderer:
             self.height // 2 - victory_rect.height // 2,
         )
         self._screen.blit(victory, position)
-
         self.text_box.rect.centerx = self.width // 2
         self.text_box.rect.centery = self.height // 2
         self.text_box.rect.centery += self.text_box.offset_y
 
+        self.draw_score(state, position, victory_rect)
         self.text_box.draw()
 
-    def _draw_game_over(self) -> None:
+    def _draw_game_over(self, state: GameState) -> None:
         game_over = pygame.image.load("assets/images/screens/game_over.png")
         game_over_rect = game_over.get_rect()
         position = (
@@ -326,7 +329,25 @@ class Renderer:
         self.text_box.rect.centery = self.height // 2
         self.text_box.rect.centery += offset_y
 
+        self.draw_score(state, position, game_over_rect)
         self.text_box.draw()
+
+    def draw_score(
+        self,
+        state: GameState,
+        screen_position: tuple[int, int],
+        screen_rec: Rect,
+    ) -> None:
+        score = str(state.player.score)
+        score_len = len(score) * 32
+        x, y = (
+            (screen_position[0] + (screen_rec.width // 2)) - score_len // 2,
+            screen_position[1] + screen_rec.height // 2 - 32,
+        )
+        for char in score:
+            digit = self.text_box.letters[char]
+            self._screen.blit(digit, (x, y))
+            x += 32
 
     def _draw_menu(self) -> None:
         self._draw_title()

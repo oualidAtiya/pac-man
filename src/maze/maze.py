@@ -21,10 +21,13 @@ class Maze:
         self.set_offests()
         self.set_cells_positions()
 
-
     def set_height_width_px(self) -> None:
-        self.width_maze_px = (32 * self.config.width + 1) + (32 * self.config.width)
-        self.height_maze_px = (32 * self.config.height + 1) + (32 * self.config.height)
+        self.width_maze_px = (32 * self.config.width + 1) + (
+            32 * self.config.width
+        )
+        self.height_maze_px = (32 * self.config.height + 1) + (
+            32 * self.config.height
+        )
 
     def set_offests(self) -> None:
         self.offest_x = (2000 // 2) - (self.config.width * 32)
@@ -35,7 +38,9 @@ class Maze:
             return row - 1 >= 0 and not self.grid[row][col].north
 
         if direction == Direction.SOUTH:
-            return row + 1 < self.config.height and not self.grid[row][col].south
+            return (
+                row + 1 < self.config.height and not self.grid[row][col].south
+            )
 
         if direction == Direction.WEST:
             return col - 1 >= 0 and not self.grid[row][col].west

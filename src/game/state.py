@@ -1,10 +1,11 @@
 from __future__ import annotations
+
 from enum import Enum, auto
+from typing import TYPE_CHECKING
 
 from src.game.ghost import Ghost, GhostBehavior
-from src.game.pacgum import Pacgum
-from src.game.pacgum import PacgumType
-from typing import TYPE_CHECKING
+from src.game.pacgum import Pacgum, PacgumType
+from src.ui.text_box import TextBox
 
 if TYPE_CHECKING:
     from src.game.player import Player
@@ -68,7 +69,9 @@ class GameState:
         self.ghosts[0].set_position((0, 0))
         self.ghosts[1].set_position((self.maze.config.width - 1, 0))
         self.ghosts[2].set_position((0, self.maze.config.height - 1))
-        self.ghosts[3].set_position((self.maze.config.width - 1, self.maze.config.height - 1))
+        self.ghosts[3].set_position(
+            (self.maze.config.width - 1, self.maze.config.height - 1)
+        )
         self.respawn_all_ghosts()
         self.time_remaining = self.maze.config.level_max_time
         self.super_pacgum_timer = 0.0
@@ -76,11 +79,12 @@ class GameState:
         for ghost in self.ghosts:
             ghost.set_behavior(GhostBehavior.CHASE)
 
-    def update(self, delta_time: float):
+    def update(self, delta_time: float, text_box: TextBox):
         eaten = self.player.eat_current_cell()
         if eaten == PacgumType.NORMAL:
             self.player.add_score(self.maze.config.points_per_pacgum)
             self.pacgum.pacgum_counter -= 1
+
         elif eaten == PacgumType.SUPER:
             self.super_pacgum_timer = self.pacgum.super_pacgum_duration
             for ghost in self.ghosts:
@@ -90,6 +94,7 @@ class GameState:
         if self.pacgum.pacgum_counter == 0:
             self.next_level()
             return
+
         if self.super_pacgum_timer > 0:
             self.super_pacgum_timer -= delta_time
 
@@ -101,6 +106,7 @@ class GameState:
             for ghost in self.ghosts:
                 g_col, g_row = ghost.position_px
                 difference = (abs(p_row - g_row), abs(p_col - g_col))
+
                 if difference[0] <= 30 and difference[1] <= 30:
                     if ghost.behavior == GhostBehavior.FLEE:
                         self.player.add_score(
@@ -110,6 +116,7 @@ class GameState:
                     else:
                         if self.player.lose_life():
                             self.screen = Screen.GAME_OVER
+                            text_box.reset()
                             break
                         self.player.dead_counter = 120
                         self.player.dead_position = self.player.position

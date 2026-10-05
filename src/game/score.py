@@ -41,4 +41,4 @@ class IO:
         except FileNotFoundError as e:
             print(f"ERROR: {e}")
 
-        return scores
+        return sorted(scores, key=lambda score: score.score, reverse=True)

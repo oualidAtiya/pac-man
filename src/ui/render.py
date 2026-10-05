@@ -267,7 +267,7 @@ class Renderer:
         for button in self._pause_buttons.values():
             button.draw(self._screen)
 
-    def _draw_high_scores(self) -> None:
+    def _draw_high_scores(self, state: GameState) -> None:
         high_scores = pygame.image.load(
             "assets/images/screens/high_scores.png"
         )
@@ -276,12 +276,35 @@ class Renderer:
             self.width // 2 - high_scores_rect.width // 2,
             self.height // 2 - high_scores_rect.height // 2,
         )
-
-        scores: list[Score] = IO().load()
         self._screen.blit(high_scores, position)
 
-        for score in scores:
-            pass
+        name_offset_x, name_offset_y = 330, 292
+        name_x, name_y = (
+            position[0] + name_offset_x,
+            position[1] + name_offset_y,
+        )
+        score_offset_x, score_offset_y = 800, 292
+        score_x, score_y = (
+            position[0] + score_offset_x,
+            position[1] + score_offset_y,
+        )
+        for score in state.scores[:10]:
+            name_x = position[0] + name_offset_x
+            for char in score.name:
+                if char == " ":
+                    name_x += 32
+                else:
+                    imgae = self.text_box.letters[char.upper()]
+                    self._screen.blit(imgae, (name_x, name_y))
+                    name_x += 32
+            name_y += 48
+
+            score_x = position[0] + score_offset_x
+            for char in str(score.score):
+                imgae = self.text_box.letters[char]
+                self._screen.blit(imgae, (score_x, score_y))
+                score_x += 32
+            score_y += 48
 
     def _draw_instructions(self) -> None:
         instructions = pygame.image.load(

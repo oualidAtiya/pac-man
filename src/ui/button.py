@@ -3,6 +3,7 @@
 import pygame
 from pygame.surface import Surface
 
+from src.game.score import IO
 from src.game.state import GameState, Screen
 
 
@@ -51,6 +52,7 @@ class Button:
                 state.screen = Screen.PLAYING
             case "high_scores":
                 state.screen = Screen.HIGH_SCORES
+                state.scores = IO().load()
             case "instructions":
                 state.screen = Screen.INSTRUCTIONS
             case "resume":

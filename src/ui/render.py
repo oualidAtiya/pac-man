@@ -5,6 +5,7 @@ from pygame.rect import Rect
 
 from src.game.direction import Direction
 from src.game.ghost import GhostBehavior
+from src.game.score import IO, Score
 from src.game.state import GameState, Screen
 from src.ui.button import Button
 from src.ui.hud import HUD
@@ -180,7 +181,12 @@ class Renderer:
                 and not self.text_box.value.isspace()
                 and self.text_box.value
             ):
-                # TODO: save the player score
+                IO().save(
+                    score=Score(
+                        name=self.text_box.value,
+                        score=state.player.score,
+                    )
+                )
                 state.screen = Screen.MENU
 
             elif key == pygame.K_BACKSPACE:
@@ -231,7 +237,7 @@ class Renderer:
             case Screen.PAUSED:
                 self._draw_pause(state)
             case Screen.HIGH_SCORES:
-                self._draw_high_scores()
+                self._draw_high_scores(state)
             case Screen.INSTRUCTIONS:
                 self._draw_instructions()
             case Screen.VICTORY:
@@ -261,7 +267,7 @@ class Renderer:
         for button in self._pause_buttons.values():
             button.draw(self._screen)
 
-    def _draw_high_scores(self) -> None:
+    def _draw_high_scores(self, state: GameState) -> None:
         high_scores = pygame.image.load(
             "assets/images/screens/high_scores.png"
         )
@@ -271,6 +277,34 @@ class Renderer:
             self.height // 2 - high_scores_rect.height // 2,
         )
         self._screen.blit(high_scores, position)
+
+        name_offset_x, name_offset_y = 330, 292
+        name_x, name_y = (
+            position[0] + name_offset_x,
+            position[1] + name_offset_y,
+        )
+        score_offset_x, score_offset_y = 800, 292
+        score_x, score_y = (
+            position[0] + score_offset_x,
+            position[1] + score_offset_y,
+        )
+        for score in state.scores[:10]:
+            name_x = position[0] + name_offset_x
+            for char in score.name:
+                if char == " ":
+                    name_x += 32
+                else:
+                    imgae = self.text_box.letters[char.upper()]
+                    self._screen.blit(imgae, (name_x, name_y))
+                    name_x += 32
+            name_y += 48
+
+            score_x = position[0] + score_offset_x
+            for char in str(score.score):
+                imgae = self.text_box.letters[char]
+                self._screen.blit(imgae, (score_x, score_y))
+                score_x += 32
+            score_y += 48
 
     def _draw_instructions(self) -> None:
         instructions = pygame.image.load(

@@ -46,6 +46,7 @@ class GameState:
         self.time_remaining = maze.config.level_max_time
         self.super_pacgum_timer = 0.0
         self.check_colission = True
+        self.scores = []
 
     def respawn_all_ghosts(self):
         for ghost in self.ghosts:

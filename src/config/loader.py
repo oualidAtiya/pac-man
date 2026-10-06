@@ -52,7 +52,7 @@ class Loader:
             logger.warning(f"duplicated keys: {duplicated}")
         return dict(pairs)
 
-    def load_config(self) -> GameConfig | None:
+    def load_config(self) -> GameConfig:
         try:
             content = self.read_config_file()
         except PermissionError:
@@ -80,7 +80,7 @@ class Loader:
         except json.JSONDecodeError as err:
             error_line = err.doc.split('\n')[err.lineno-1]
             logger.json_error(error_line, self.file_name)
-            return None
+            return GameConfig.model_validate(None)
 
         config = GameConfig.model_validate(data)
         return config

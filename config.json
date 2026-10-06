@@ -1,10 +1,12 @@
-{
+{#comment
 
-    "lives":3,
+    "lives":5,#comment
     "seed": 96,
-    "points_per_pacgum": 1000,
-    "points_per_super_pacgum": 50,
-    "points_per_ghost": 200,
+    "points_per_pacgum": 70,
+    "points_per_super_pacgum": 80,
+    "points_per_ghost": 90,
     "super_gum_time": 60,
-    "level_max_time": 5
-}
+    "level_max_time": 120
+    #comment
+}#comment
+#comment

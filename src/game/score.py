@@ -5,7 +5,7 @@ from pydantic import BaseModel, ValidationError, Field, ConfigDict
 import json
 
 class Score(BaseModel):
-    name: str = Field(pattern=r"^\S+$")
+    name: str = Field(pattern=r"^[A-Za-z0-9]+$")
     score: int = Field(gt=0, lt=9999999999)
 
     model_config = ConfigDict(extra='forbid')
@@ -27,6 +27,8 @@ class IO:
                 json.dump(highscores, f, indent=2)
         except PermissionError:
             logger.warning(f"{self.path} don't have write permission")
+        except IsADirectoryError:
+            logger.warning(f"{self.path} should be file not a directory")
         except Exception:
             logger.warning(f"unxpected error happend")
 
@@ -52,6 +54,8 @@ class IO:
             logger.warning(f"{self.path} don't have read permission")
         except FileNotFoundError:
             logger.warning(f"{self.path} not found")
+        except IsADirectoryError:
+            logger.warning(f"{self.path} should be file not a directory")
         except ValueError as e:
             logger.json_error(e, self.path)
         except Exception:

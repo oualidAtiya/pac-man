@@ -1,11 +1,12 @@
 PYTHON = python3
 MANAGER = uv run
+ARG = config.json
 
 install:
 	uv sync
 
 run:
-	@$(MANAGER) $(PYTHON) pac-man.py config.json
+	--@$(MANAGER) $(PYTHON) pac-man.py $(ARG)
 
 debug:
 	@$(MANAGER) $(PYTHON) pdb pac-man.py

@@ -79,7 +79,7 @@ class Loader:
             )
         except json.JSONDecodeError as err:
             error_line = err.doc.split('\n')[err.lineno-1]
-            logger.json_error(error_line)
+            logger.json_error(error_line, self.file_name)
             return None
 
         config = GameConfig.model_validate(data)

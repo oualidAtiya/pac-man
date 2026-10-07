@@ -81,7 +81,7 @@ class HUD:
         self._draw_remain_time(
             screen,
             state.time_remaining,
-            (maze.offest_x + width_px - 150, maze.offest_y + height_px + 50),
+            (maze.offest_x + width_px - 182, maze.offest_y + height_px + 50),
         )
         self._draw_current_level(
             screen,

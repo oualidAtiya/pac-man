@@ -181,7 +181,7 @@ class Renderer:
                 and not self.text_box.value.isspace()
                 and self.text_box.value
             ):
-                IO().save(
+                IO(state.maze.config.highscore_filename).save(
                     score=Score(
                         name=self.text_box.value,
                         score=state.player.score,

@@ -36,5 +36,7 @@ if __name__ == "__main__":
         main()
     except GeneratorError as e:
         logger.error(str(e))
-    except Exception as e:
-        logger.error(str(e))
+    except KeyboardInterrupt:
+        logger.error("Interrupted by the user.")
+    except Exception:
+        logger.error("Unexpected error.")

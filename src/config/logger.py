@@ -7,6 +7,9 @@ class Logger:
         self.warning_id += 1
         print(f"\033[1;33mWarning #{self.warning_id}: {msg}\033[0m")
 
+    def error(self, msg: str) -> None:
+        print(f"\033[1;31mError : {msg}\033[0m")
+
     def json_error(self, error_line: str, file_name: str) -> None:
         print(
             f"\033[91;1mJson Error ({file_name}): >>>\033[0m{error_line}"

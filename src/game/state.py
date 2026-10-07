@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING
 
 from src.game.ghost import Ghost, GhostBehavior
 from src.game.pacgum import Pacgum, PacgumType
-from src.ui.text_box import TextBox
 from src.game.score import Score
+from src.ui.text_box import TextBox
 
 if TYPE_CHECKING:
     from src.game.player import Player

@@ -13,13 +13,19 @@ from pygame import Surface
 
 from src.game.direction import Direction
 from src.maze.cell import Cell
-from src.maze.maze import Maze
 
 _DELTA = {
     Direction.NORTH: (0, -1),
     Direction.SOUTH: (0, 1),
     Direction.EAST: (1, 0),
     Direction.WEST: (-1, 0),
+}
+
+_OPPOSITE = {
+    Direction.NORTH: Direction.SOUTH,
+    Direction.SOUTH: Direction.NORTH,
+    Direction.EAST: Direction.WEST,
+    Direction.WEST: Direction.EAST,
 }
 
 
@@ -36,6 +42,13 @@ class GhostColor(Enum):
     PINK = "pink"
     BLUE = "blue"
     ORANGE = "orange"
+
+
+_RANDOM_MOVEMENT_GHOSTS_BY_LEVEL: dict[int, frozenset[GhostColor]] = {
+    5: frozenset({GhostColor.BLUE, GhostColor.ORANGE, GhostColor.PINK}),
+    6: frozenset({GhostColor.BLUE, GhostColor.PINK}),
+    7: frozenset({GhostColor.PINK}),
+}
 
 
 class Ghost:
@@ -68,8 +81,12 @@ class Ghost:
         if self.target is not None:
             return
 
-        options = self._valid_directions(state.maze)
-        self.direction = self._choose_direction(state, options)
+        uses_random_movement = self._uses_random_movement(state.level)
+
+        options = self._valid_directions(state, uses_random_movement)
+        self.direction = self._choose_direction(
+            state, options, uses_random_movement
+        )
 
         dx, dy = _DELTA[self.direction]
         col, row = self.position
@@ -94,25 +111,44 @@ class Ghost:
         self.position = self.spawn_position
         self.target = None
 
-    def _valid_directions(self, maze: Maze) -> list[Direction]:
+    def _uses_random_movement(self, level: int) -> bool:
+        return level < 5 or self.color in _RANDOM_MOVEMENT_GHOSTS_BY_LEVEL.get(
+            level, frozenset()
+        )
+
+    def _valid_directions(
+        self, state: GameState, uses_random_movement: bool
+    ) -> list[Direction]:
         """Directions not blocked by a wall, excluding reversal unless
         it's the only option (dead end)."""
         directions = list(Direction)
         random.shuffle(directions)
         col, row = self.position
 
-        options = [d for d in directions if maze.can_move(col, row, d)]
+        options = [d for d in directions if state.maze.can_move(col, row, d)]
 
-        return options
+        non_reverse = []
+        if uses_random_movement:
+            non_reverse = [
+                d for d in options if d != _OPPOSITE[self.direction]
+            ]
+
+        return non_reverse or options
 
     def _choose_direction(
-        self, state: GameState, options: list[Direction]
+        self,
+        state: GameState,
+        options: list[Direction],
+        uses_random_movement: bool,
     ) -> Direction:
         """PLACEHOLDER for step 2: random choice among valid options.
         Once this is confirmed working, this is the only method that
         changes to add real chase targeting (compare each option's
         resulting distance to player_position, pick the minimum).
         """
+        if uses_random_movement:
+            return random.choice(options)
+
         player_row, player_col = state.player.current_cell
         player_position = player_col, player_row
 

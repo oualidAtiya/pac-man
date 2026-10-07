@@ -68,10 +68,7 @@ class Loader:
             )
             return GameConfig.model_validate(None)
         except IsADirectoryError:
-            logger.warning(
-                f"'{self.file_name}' file not "
-                "found default config will be used"
-            )
+            logger.warning(f"{self.path} should be file not a directory")
             return GameConfig.model_validate(None)
 
         striped_content = Loader.strip_comments(content)

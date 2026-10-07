@@ -16,8 +16,8 @@ clean:
 
 lint:
 	@$(MANAGER) flake8 --exclude .venv .
-	@$(MANAGER) mypy src/. --warn-return-any
-	--warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs
+	@$(MANAGER) mypy . --warn-return-any \
+	--warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs \
 	--check-untyped-defs
 
 .PHONY: install run debug clean lint

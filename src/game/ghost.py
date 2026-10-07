@@ -42,13 +42,13 @@ class Ghost:
     """A single ghost entity."""
 
     def __init__(self, position: tuple[int, int], color: GhostColor) -> None:
-        self.position: tuple[int, int] | None = None
-        self.spawn_position: tuple[int, int] | None = None
+        self.position: tuple[int, int] = position
+        self.spawn_position: tuple[int, int] = position
         self.set_position(position)
         self.direction = Direction.NORTH
         self.behavior = GhostBehavior.CHASE
         self.color = color
-        self.position_px = (0, 0)
+        self.position_px = (0.0, 0.0)
         self.target: tuple[int, int] | None = None
         self.progress = 0
         self.speed = 2
@@ -158,7 +158,7 @@ class Ghost:
                 scared_ghost_themes[scared_frame]
             ).convert_alpha()
 
-        col, row = self.position
+        col, row = float(self.position[0]), float(self.position[1])
         if self.target is not None:
             target_col, target_row = self.target
             ratio = self.progress / (Cell.CELL_SIZE * 2)

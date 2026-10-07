@@ -1,12 +1,12 @@
 from src.config.loader import Loader
+from src.config.logger import logger
 from src.game.ghost import Ghost, GhostColor
 from src.game.pacgum import Pacgum
 from src.game.player import Player
 from src.game.state import GameState
+from src.maze.generator_error import GeneratorError
 from src.maze.maze import Maze
 from src.ui.render import Renderer
-from src.config.logger import logger
-from src.maze.generator_error import GeneratorError
 
 
 def main() -> None:
@@ -35,6 +35,6 @@ if __name__ == "__main__":
     try:
         main()
     except GeneratorError as e:
-        logger.error(e)
+        logger.error(str(e))
     except Exception as e:
-        logger.error(e)
+        logger.error(str(e))

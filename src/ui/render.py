@@ -1,7 +1,6 @@
 """Owns the game window and the main loop."""
 
 import pygame
-from pygame.rect import Rect
 
 from src.game.direction import Direction
 from src.game.ghost import GhostBehavior
@@ -10,6 +9,7 @@ from src.game.state import GameState, Screen
 from src.ui.button import Button
 from src.ui.hud import HUD
 from src.ui.text_box import TextBox
+from src.ui.utils import Rectangle
 
 
 class Renderer:
@@ -257,7 +257,9 @@ class Renderer:
 
     def _draw_pause(self, state: GameState) -> None:
         pause = pygame.image.load("assets/images/screens/pause.png")
-        pause_rec = pause.get_rect()
+        width = 768
+        height = 584
+        pause_rec = Rectangle(0, 0, width, height)
         position = (
             self.width // 2 - pause_rec.width // 2,
             self.height // 2 - pause_rec.height // 2,
@@ -271,7 +273,9 @@ class Renderer:
         high_scores = pygame.image.load(
             "assets/images/screens/high_scores.png"
         )
-        high_scores_rect = high_scores.get_rect()
+        width = 1280
+        height = 960
+        high_scores_rect = Rectangle(0, 0, width, height)
         position = (
             self.width // 2 - high_scores_rect.width // 2,
             self.height // 2 - high_scores_rect.height // 2,
@@ -310,7 +314,8 @@ class Renderer:
         instructions = pygame.image.load(
             "assets/images/screens/instructions.png"
         )
-        instructions_rect = instructions.get_rect()
+        width, height = 1280, 960
+        instructions_rect = Rectangle(0, 0, width, height)
         position = (
             self.width // 2 - instructions_rect.width // 2,
             self.height // 2 - instructions_rect.height // 2,
@@ -336,7 +341,9 @@ class Renderer:
 
     def _draw_victory(self, state: GameState) -> None:
         victory = pygame.image.load("assets/images/screens/victory.png")
-        victory_rect = victory.get_rect()
+        width = 1280
+        height = 960
+        victory_rect = Rectangle(0, 0, width, height)
         position = (
             self.width // 2 - victory_rect.width // 2,
             self.height // 2 - victory_rect.height // 2,
@@ -351,7 +358,9 @@ class Renderer:
 
     def _draw_game_over(self, state: GameState) -> None:
         game_over = pygame.image.load("assets/images/screens/game_over.png")
-        game_over_rect = game_over.get_rect()
+        width = 1280
+        height = 960
+        game_over_rect = Rectangle(0, 0, width, height)
         position = (
             self.width // 2 - game_over_rect.width // 2,
             self.height // 2 - game_over_rect.height // 2,
@@ -370,7 +379,7 @@ class Renderer:
         self,
         state: GameState,
         screen_position: tuple[int, int],
-        screen_rec: Rect,
+        screen_rec: Rectangle,
     ) -> None:
         score = str(state.player.score)
         score_len = len(score) * 32
@@ -390,10 +399,11 @@ class Renderer:
 
     def _draw_title(self) -> None:
         title = pygame.image.load("assets/images/title.png")
-        title_rect = title.get_rect()
+        width, height = 736, 112
+        title_rect = Rectangle(0, 0, width, height)
         title_rect.centerx = self.width // 2
         title_rect.top += 192
-        self._screen.blit(title, title_rect)
+        self._screen.blit(title, tuple(title_rect))
 
     def _shutdown(self) -> None:
         """Release pygame resources so no window or process is left hanging."""

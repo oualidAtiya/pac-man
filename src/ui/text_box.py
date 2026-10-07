@@ -3,6 +3,8 @@ import string
 import pygame
 from pygame.surface import Surface
 
+from src.ui.utils import Rectangle
+
 
 class TextBox:
     def __init__(self, screen: Surface) -> None:
@@ -11,7 +13,9 @@ class TextBox:
             letter: pygame.image.load(f"assets/images/letters/{letter}.png")
             for letter in [*string.digits, *string.ascii_uppercase]
         }
-        self.rect = self.image.get_rect()
+        self.width = 576
+        self.height = 92
+        self.rect = Rectangle(0, 0, self.width, self.height)
         self.screen = screen
         self.offset_y = 174
         self.max_chars = 10
@@ -28,7 +32,7 @@ class TextBox:
         self.value = self.value[:-1]
 
     def draw(self) -> None:
-        self.screen.blit(self.image, self.rect)
+        self.screen.blit(self.image, tuple(self.rect))
         self.draw_text()
 
     def draw_text(self) -> None:
@@ -40,4 +44,4 @@ class TextBox:
             else:
                 image = self.letters[char.upper()]
                 self.rect.centerx += 32
-                self.screen.blit(image, self.rect)
+                self.screen.blit(image, tuple(self.rect))

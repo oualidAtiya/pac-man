@@ -5,6 +5,7 @@ from pygame.surface import Surface
 
 from src.game.score import IO
 from src.game.state import GameState, Screen
+from src.ui.utils import Rectangle
 
 
 class Button:
@@ -25,7 +26,9 @@ class Button:
                 f"assets/images/buttons/{name}_pressed.png"
             ).convert_alpha(),
         }
-        self.rect = self._images["normal"].get_rect()
+        self.width = 448
+        self.heigh = 96
+        self.rect = Rectangle(0, 0, self.width, self.heigh)
         self.state = "normal"
         self.name = name
 
@@ -63,4 +66,4 @@ class Button:
                 state.screen = Screen.EXIT
 
     def draw(self, screen: Surface) -> None:
-        screen.blit(self._images[self.state], self.rect)
+        screen.blit(self._images[self.state], tuple(self.rect))

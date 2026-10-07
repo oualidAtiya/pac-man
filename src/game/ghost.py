@@ -175,7 +175,5 @@ class Ghost:
         frame_width = 32
         frame_height = 32
 
-        sprite = sheet.subsurface(
-            (normal_frame * frame_width, 0, frame_width, frame_height)
-        )
-        screen.blit(sprite, (screen_x, screen_y))
+        sprite_area = normal_frame * frame_width, 0, frame_width, frame_height
+        screen.blit(sheet, (screen_x, screen_y), sprite_area)

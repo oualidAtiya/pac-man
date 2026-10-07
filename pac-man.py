@@ -5,7 +5,7 @@ from src.game.state import GameState
 from src.maze.maze import Maze
 from src.ui.render import Renderer
 from src.game.pacgum import Pacgum
-
+ 
 def main():
     loader = Loader()
     config = loader.load_config()

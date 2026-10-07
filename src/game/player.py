@@ -10,14 +10,14 @@ from src.maze.maze import Maze
 class Player:
     def __init__(self, maze: Maze) -> None:
         self.maze = maze
-        self.start_cell = None
-        self.current_cell = None
-        self.position = None
-        self.respawn_position = None
-        self.current_direction = None
-        self.dead_position: None | tuple[int, int] = None
-        self.next_direction: None | Direction = None
-        self.target: None | tuple[int, int] = None
+        self.start_cell = (0, 0)
+        self.current_cell = (0, 0)
+        self.position = (0, 0)
+        self.respawn_position = (0, 0)
+        self.current_direction: Direction | None = None
+        self.dead_position = (0, 0)
+        self.next_direction: Direction | None = None
+        self.target: tuple[int, int] | None = None
         self.score = 0
         self.dead_counter = 0
         self.lives = maze.config.lives
@@ -58,8 +58,7 @@ class Player:
                 return 0
             if 32 < self.acc <= 48:
                 return 2
-            else:
-                return 1
+            return 1
         else:
             if 90 <= self.dead_counter <= 120:
                 return 0
@@ -67,10 +66,9 @@ class Player:
                 return 1
             if 30 <= self.dead_counter < 60:
                 return 2
-            if 0 < self.dead_counter < 30:
-                return 3
+            return 3
 
-    def draw_die_state(self, screen: Surface):
+    def draw_die_state(self, screen: Surface) -> None:
         path = "assets/images/pac-man"
         frames = ["1.png", "2.png", "3.png", "4.png"]
         current_frame = self._get_current_frame(False)

@@ -1,3 +1,6 @@
+from typing import Any
+
+
 class Cell:
     CELL_SIZE = 32
 
@@ -7,15 +10,9 @@ class Cell:
         self.south = (cell_value & 4) != 0
         self.west = (cell_value & 8) != 0
         self.is_42 = cell_value == 15
-        self.content_position_px = None
-        # self.gum_position = (0, 0)
+        self.content_position_px = (0, 0)
         self.has_pacgum = False
         self.has_super_pacgum = False
-
-    def __repr__(self):
-        return (
-            f"(n={self.north}, e={self.east}, s={self.south}, w={self.west})"
-        )
 
     @staticmethod
     def get_corner(up: bool, right: bool, bottom: bool, left: bool) -> int:
@@ -51,28 +48,28 @@ class Cell:
             return 6
         return 10
 
-    def get_nw_corner(self, north_cell: any, west_cell: any) -> int:
+    def get_nw_corner(self, north_cell: Any, west_cell: Any) -> int:
         up = north_cell.west if north_cell else False
         bottom = self.west
         left = west_cell.north if west_cell else False
         right = self.north
         return Cell.get_corner(up, right, bottom, left)
 
-    def get_ne_corner(self, north_cell: any, east_cell: any) -> int:
+    def get_ne_corner(self, north_cell: Any, east_cell: Any) -> int:
         up = north_cell.east if north_cell else False
         bottom = self.east
         left = self.north
         right = east_cell.north if east_cell else False
         return Cell.get_corner(up, right, bottom, left)
 
-    def get_se_corner(self, east_cell: any, south_cell: any) -> int:
+    def get_se_corner(self, east_cell: Any, south_cell: Any) -> int:
         up = self.east
         bottom = south_cell.east if south_cell else False
         left = self.south
         right = east_cell.south if east_cell else False
         return Cell.get_corner(up, right, bottom, left)
 
-    def get_sw_corner(self, west_cell: any, south_cell: any) -> int:
+    def get_sw_corner(self, west_cell: Any, south_cell: Any) -> int:
         up = self.west
         bottom = south_cell.west if south_cell else False
         left = west_cell.south if west_cell else False

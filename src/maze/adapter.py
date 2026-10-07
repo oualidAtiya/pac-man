@@ -1,8 +1,8 @@
 from src.config.logger import logger
 try:
-    from mazegenerator import MazeGenerator
+    from mazegenerator import MazeGenerator  # type: ignore[import-untyped]
 except ImportError:
-    ...
+    logger.error("Can't import 'MazeGenerator'")
 from src.config.models import GameConfig
 from src.maze.cell import Cell
 

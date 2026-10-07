@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 from src.game.ghost import Ghost, GhostBehavior
 from src.game.pacgum import Pacgum, PacgumType
 from src.ui.text_box import TextBox
+from src.game.score import Score
 
 if TYPE_CHECKING:
     from src.game.player import Player
@@ -46,9 +47,9 @@ class GameState:
         self.time_remaining = maze.config.level_max_time
         self.super_pacgum_timer = 0.0
         self.check_colission = True
-        self.scores = []
+        self.scores: list[Score] = []
 
-    def respawn_all_ghosts(self):
+    def respawn_all_ghosts(self) -> None:
         for ghost in self.ghosts:
             ghost.respawn()
 
@@ -80,7 +81,7 @@ class GameState:
         for ghost in self.ghosts:
             ghost.set_behavior(GhostBehavior.CHASE)
 
-    def update(self, delta_time: float, text_box: TextBox):
+    def update(self, delta_time: float, text_box: TextBox) -> None:
         eaten = self.player.eat_current_cell()
         if eaten == PacgumType.NORMAL:
             self.player.add_score(self.maze.config.points_per_pacgum)

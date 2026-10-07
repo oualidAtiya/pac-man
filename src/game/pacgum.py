@@ -33,8 +33,8 @@ class Pacgum:
         self.pac_gum_positions = self.__put_gums()
         self.super_pacgum_duration = super_pacgum_duration
 
-    def __get_allowed_positions(self):
-        positions = []
+    def __get_allowed_positions(self) -> list[tuple[int, int]]:
+        positions: list[tuple[int, int]] = []
         for y in range(self.maze.config.height):
             for x in range(self.maze.config.width):
                 cell = self.maze.grid[y][x]
@@ -57,8 +57,8 @@ class Pacgum:
             if cell.has_super_pacgum:
                 screen.blit(super_gum, cell.content_position_px)
 
-    def __put_gums(self) -> None:
-        positions = []
+    def __put_gums(self) -> list[tuple[int, int]]:
+        positions: list[tuple[int, int]] = []
         for _ in range(self.pacgum_number):
             shuffle(self.cell_positions)
             y, x = self.cell_positions.pop(0)

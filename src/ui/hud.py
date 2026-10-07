@@ -39,8 +39,8 @@ class HUD:
         self, screen: Surface, number: int, corr: tuple[int, int]
     ) -> None:
         x, y = corr
-        number = str(number)
-        for digit in number:
+        number_str = str(number)
+        for digit in number_str:
             screen.blit(self.digits[digit], (x, y))
             x += 28
 
@@ -94,7 +94,7 @@ class HUD:
         if state.super_pacgum_timer > 0:
             self._draw_super_time(
                 screen,
-                state.super_pacgum_timer,
+                int(state.super_pacgum_timer),
                 (maze.offest_x + width_px - 250, maze.offest_y - 50),
             )
 

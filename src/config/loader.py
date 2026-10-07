@@ -25,7 +25,7 @@ class Loader:
         parser = ArgumentParser()
         parser.add_argument("file_name", type=Loader.json_type)
         args = parser.parse_args()
-        return args.file_name
+        return str(args.file_name)
 
     def read_config_file(self) -> list[str]:
         with open(self.file_name) as config:
@@ -68,7 +68,7 @@ class Loader:
             )
             return GameConfig.model_validate(None)
         except IsADirectoryError:
-            logger.warning(f"{self.path} should be file not a directory")
+            logger.warning(f"{self.file_name} should be file not a directory")
             return GameConfig.model_validate(None)
 
         striped_content = Loader.strip_comments(content)
@@ -81,8 +81,8 @@ class Loader:
             )
         except json.JSONDecodeError as err:
             error_line = err.doc.split("\n")[err.lineno - 1]
-            logger.json_error(error_line)
-            return None
+            logger.json_error(error_line, self.file_name)
+            return GameConfig.model_validate(None)
 
         config = GameConfig.model_validate(data)
         return config

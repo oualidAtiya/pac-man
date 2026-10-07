@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 from src.config.logger import logger
 from pydantic import BaseModel, ValidationError, Field, ConfigDict
-import json
+
 
 class Score(BaseModel):
     name: str = Field(pattern=r"^[A-Za-z0-9 ]+$", max_length=10)
@@ -10,8 +10,10 @@ class Score(BaseModel):
 
     model_config = ConfigDict(extra='forbid')
 
+
 class Data(BaseModel):
-    scores : list[Score]
+    scores: list[Score]
+
 
 class IO:
     def __init__(self, path: str) -> None:
@@ -30,9 +32,9 @@ class IO:
         except IsADirectoryError:
             logger.warning(f"{self.path} should be file not a directory")
         except Exception:
-            logger.warning(f"unxpected error happend")
+            logger.warning("unxpected error happend")
 
-    def load(self) -> list[Score] | list[None]:
+    def load(self) -> list[Score]:
         scores: list[Score] = []
         is_error = True
         try:
@@ -43,23 +45,23 @@ class IO:
                 data = json.loads(data)
                 if not isinstance(data, list):
                     raise ValueError("data should be wrapped in list")
-                scores = Data(scores=data)
+                scores = Data(scores=data).scores
                 is_error = False
         except ValidationError as e:
             logger.pydantic_error(json.loads(e.json()))
         except json.JSONDecodeError as err:
             error_line = err.doc.split('\n')[err.lineno-1]
-            logger.json_error(error_line, self.path)
+            logger.json_error(error_line, self.path.name)
         except PermissionError:
-            logger.warning(f"{self.path} don't have read permission")
+            logger.warning(f"{self.path.name} don't have read permission")
         except FileNotFoundError:
-            logger.warning(f"{self.path} not found")
+            logger.warning(f"{self.path.name} not found")
         except IsADirectoryError:
-            logger.warning(f"{self.path} should be file not a directory")
+            logger.warning(f"{self.path.name} should be file not a directory")
         except ValueError as e:
-            logger.json_error(e, self.path)
+            logger.json_error(str(e), self.path.name)
         except Exception:
-            logger.warning(f"unxpected error happend")
+            logger.warning("unxpected error happend")
         if not is_error:
-            return sorted(scores.scores, key=lambda score: score.score, reverse=True)
+            return sorted(scores, key=lambda score: score.score, reverse=True)
         return []

@@ -71,13 +71,13 @@ class Renderer:
 
         return buttons
 
-    def handle_delay(self, state) -> None:
+    def handle_delay(self, state: GameState) -> None:
         if state.time_remaining > 0 and self.current_frame == 60:
             state.time_remaining -= 1
             self.current_frame = 0
         self.current_frame += 1
 
-    def check_time(self, state) -> None:
+    def check_time(self, state: GameState) -> None:
         if state.player.is_time_out(state):
             if state.player.lose_life():
                 state.screen = Screen.GAME_OVER

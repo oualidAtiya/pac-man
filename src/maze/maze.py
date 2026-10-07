@@ -16,10 +16,10 @@ class Maze:
             raise GeneratorError("Maze Generation Failed")
         self.config = config
         self.default = config.height, config.width
-        self.width_maze_px = None
-        self.height_maze_px = None
-        self.offest_x = None
-        self.offest_y = None
+        self.width_maze_px = 0
+        self.height_maze_px = 0
+        self.offest_x = 0
+        self.offest_y = 0
         self.set_height_width_px()
         self.set_offests()
         self.set_cells_positions()

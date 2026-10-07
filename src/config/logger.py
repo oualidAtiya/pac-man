@@ -1,5 +1,5 @@
 class Logger:
-    def __init__(self):
+    def __init__(self) -> None:
         self.warning_id = 0
 
     def warning(self, msg: str) -> None:
@@ -11,7 +11,8 @@ class Logger:
 
     def json_error(self, error_line: str, file_name: str) -> None:
         print(
-            f"\033[91;1mJson Error: >>>\033[0m{error_line}\033[91;1m<<<\033[0m"
+            f"\033[91;1mJson Error ({file_name}): "
+            ">>>\033[0m{error_line}\033[91;1m<<<\033[0m"
         )
 
     def pydantic_error(self, errs: dict) -> None:
@@ -22,5 +23,6 @@ class Logger:
                     f"\033[1;91mPydnatic Error ({key[2]}):\033[0m", end="")
             if (err.get('msg', False)):
                 print(f"\033[1;91m {err.get('msg')}\033[0m")
+
 
 logger = Logger()

@@ -1,9 +1,8 @@
 import re
 from typing import Any
-
 from pydantic import BaseModel, model_validator
-
 from src.config.logger import logger
+
 
 class Required(BaseModel):
     lives: int = 3
@@ -14,6 +13,7 @@ class Required(BaseModel):
     points_per_super_pacgum: int = 20
     points_per_ghost: int = 30
     highscore_filename: str = 'highscores.json'
+
 
 class GameConfig(BaseModel):
     width: int = 10
@@ -29,7 +29,7 @@ class GameConfig(BaseModel):
 
     @model_validator(mode="before")
     @classmethod
-    def validate_fields(cls, data: Any):
+    def validate_fields(cls, data: Any) -> dict:
         if data is None:
             return {}
         if not isinstance(data, dict):

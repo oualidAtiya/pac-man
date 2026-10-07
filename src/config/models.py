@@ -5,6 +5,22 @@ from src.config.logger import logger
 
 
 class Required(BaseModel):
+    """Reference model holding the default value of each required key.
+
+    It is only used by ``GameConfig.validate_fields`` to know which keys
+    are expected and which default replaces a missing or invalid value.
+
+    Attributes:
+        lives: Number of lives the player starts with.
+        seed: Seed used to generate the first maze.
+        super_gum_time: Seconds ghosts stay edible after a super-pacgum.
+        level_max_time: Time limit of a level, in seconds.
+        points_per_pacgum: Points earned for eating a pacgum.
+        points_per_super_pacgum: Points earned for a super-pacgum.
+        points_per_ghost: Points earned for eating an edible ghost.
+        highscore_filename: Name of the json file storing highscores.
+    """
+
     lives: int = 3
     seed: int = 42
     super_gum_time: int = 10
@@ -16,6 +32,21 @@ class Required(BaseModel):
 
 
 class GameConfig(BaseModel):
+    """Validated game configuration with default values.
+
+    Attributes:
+        width: Width of the maze.
+        height: Height of the maze.
+        lives: Number of lives the player starts with.
+        seed: Seed used to generate the first maze.
+        super_gum_time: Seconds ghosts stay edible after a super-pacgum.
+        level_max_time: Time limit of a level, in seconds.
+        points_per_pacgum: Points earned for eating a pacgum.
+        points_per_super_pacgum: Points earned for a super-pacgum.
+        points_per_ghost: Points earned for eating an edible ghost.
+        highscore_filename: Name of the json file storing highscores.
+    """
+
     width: int = 10
     height: int = 10
     lives: int = 3
@@ -30,6 +61,23 @@ class GameConfig(BaseModel):
     @model_validator(mode="before")
     @classmethod
     def validate_fields(cls, data: Any) -> dict:
+        """Clean the raw configuration before pydantic validates it.
+
+        Runs before the normal field validation. Unknown keys are
+        reported, missing keys are reported, and invalid values (not a
+        positive int, or not a valid json file name for the highscore
+        file) are replaced by their default value. A warning is logged
+        for each problem.
+
+        Args:
+            data: The raw data loaded from the configuration file, or
+                None when no configuration is available.
+
+        Returns:
+            A dictionary with invalid values replaced by defaults. An
+            empty dictionary is returned if ``data`` is None or is not
+            a dictionary, so that every default is used.
+        """
         if data is None:
             return {}
         if not isinstance(data, dict):

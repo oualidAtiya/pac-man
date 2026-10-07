@@ -24,7 +24,13 @@ _DELTA = {
 
 
 class GhostBehavior(Enum):
-    """A ghost's current behavioral mode."""
+    """The behavior mode a ghost can be in.
+
+    Attributes:
+        CHASE: The ghost pursues the player.
+        FLEE: The ghost is edible and runs away from the player.
+        EATEN: The ghost was eaten and is returning to its spawn.
+    """
 
     CHASE = auto()  # actively pursuing the player
     FLEE = auto()  # edible/frightened, running from the player
@@ -32,6 +38,15 @@ class GhostBehavior(Enum):
 
 
 class GhostColor(Enum):
+    """The color of a ghost, which also selects its sprite sheet.
+
+    Attributes:
+        RED: Red ghost.
+        PINK: Pink ghost.
+        BLUE: Blue ghost.
+        ORANGE: Orange ghost.
+    """
+
     RED = "red"
     PINK = "pink"
     BLUE = "blue"
@@ -39,32 +54,67 @@ class GhostColor(Enum):
 
 
 class Ghost:
-    """A single ghost entity."""
+    """A ghost that moves through the maze and chases or flees the player.
+
+    Attributes:
+        position: Current (column, row) cell of the ghost.
+        spawn_position: Cell where the ghost starts and respawns.
+        direction: Direction of the last chosen move.
+        behavior: Current behavior mode of the ghost.
+        color: Color of the ghost, used to pick its sprite.
+        position_px: Last screen position (x, y) where it was drawn.
+        target: Cell the ghost is moving toward, or None if idle.
+        progress: Movement progress toward the target cell.
+        speed: Progress added to the movement on each update.
+    """
 
     def __init__(self, position: tuple[int, int], color: GhostColor) -> None:
+        """Create a ghost at a given cell.
+
+        Args:
+            position: The (column, row) cell where the ghost spawns.
+            color: The color of the ghost.
+        """
         self.position: tuple[int, int] = position
         self.spawn_position: tuple[int, int] = position
         self.set_position(position)
         self.direction = Direction.NORTH
         self.behavior = GhostBehavior.CHASE
         self.color = color
-        self.position_px = (0.0, 0.0)
+        self.position_px = (0, 0)
         self.target: tuple[int, int] | None = None
         self.progress = 0
         self.speed = 2
 
     def set_position(self, position: tuple[int, int]) -> None:
+        """Place the ghost on a cell and set it as its spawn cell.
+
+        Args:
+            position: The (column, row) cell to place the ghost on.
+        """
         self.position_px = (0, 0)
         self.position = position
         self.spawn_position = position
 
     @property
     def is_edible(self) -> bool:
-        """Whether the player can currently eat this ghost."""
+        """Tell whether the player can currently eat this ghost.
+
+        Returns:
+            True if the ghost is in the FLEE behavior, False otherwise.
+        """
         return self.behavior == GhostBehavior.FLEE
 
     def move(self, state: GameState) -> None:
-        """Advance one step according to the current behavior mode."""
+        """Start a move to a neighboring cell if the ghost is idle.
+
+        Does nothing while the ghost is still moving toward a target.
+        Otherwise it picks a direction among the valid ones and sets
+        the next target cell.
+
+        Args:
+            state: The current game state.
+        """
         if self.target is not None:
             return
 
@@ -77,6 +127,12 @@ class Ghost:
         self.progress = 0
 
     def update_position(self) -> None:
+        """Advance the movement toward the target cell.
+
+        Adds the ghost speed to the progress. When the progress reaches
+        a full cell, the ghost arrives on the target cell and becomes
+        idle again.
+        """
         if self.target is None:
             return
 
@@ -87,16 +143,31 @@ class Ghost:
             self.progress = 0
 
     def set_behavior(self, behavior: GhostBehavior) -> None:
-        """Transition to a new behavior mode (e.g. on super-pacgum pickup)."""
+        """Change the behavior mode of the ghost.
+
+        Args:
+            behavior: The new behavior mode, for example FLEE after
+                the player eats a super-pacgum.
+        """
         self.behavior = behavior
 
     def respawn(self) -> None:
+        """Send the ghost back to its spawn cell and cancel its move."""
         self.position = self.spawn_position
         self.target = None
 
     def _valid_directions(self, maze: Maze) -> list[Direction]:
-        """Directions not blocked by a wall, excluding reversal unless
-        it's the only option (dead end)."""
+        """List the directions the ghost can take from its cell.
+
+        Directions are shuffled, then the ones blocked by a wall are
+        removed.
+
+        Args:
+            maze: The maze used to check for walls.
+
+        Returns:
+            The directions that are not blocked, in random order.
+        """
         directions = list(Direction)
         random.shuffle(directions)
         col, row = self.position
@@ -108,10 +179,20 @@ class Ghost:
     def _choose_direction(
         self, state: GameState, options: list[Direction]
     ) -> Direction:
-        """PLACEHOLDER for step 2: random choice among valid options.
-        Once this is confirmed working, this is the only method that
-        changes to add real chase targeting (compare each option's
-        resulting distance to player_position, pick the minimum).
+        """Choose the next direction according to the ghost behavior.
+
+        For each option, the maze distance from the neighbor cell to
+        the player is computed. A chasing ghost takes the option with
+        the smallest distance and a fleeing ghost takes the largest.
+        A random option is used if no distance is available or for any
+        other behavior.
+
+        Args:
+            state: The current game state.
+            options: The valid directions to choose from.
+
+        Returns:
+            The chosen direction.
         """
         player_row, player_col = state.player.current_cell
         player_position = player_col, player_row
@@ -140,6 +221,19 @@ class Ghost:
     def draw(
         self, screen: Surface, state: GameState, animation_time: float
     ) -> None:
+        """Draw the ghost on the screen.
+
+        Picks the sprite sheet from the ghost color, or a scared sheet
+        when it is fleeing, then selects the animation frame from the
+        elapsed time. While moving, the position is interpolated
+        between the current cell and the target cell.
+
+        Args:
+            screen: The surface to draw on.
+            state: The current game state, used for the maze offsets.
+            animation_time: Elapsed time in seconds, used to choose the
+                animation frame.
+        """
         sheet = pygame.image.load(
             f"assets/images/ghosts/{self.color.value}_ghost.png"
         ).convert_alpha()
@@ -158,7 +252,7 @@ class Ghost:
                 scared_ghost_themes[scared_frame]
             ).convert_alpha()
 
-        col, row = float(self.position[0]), float(self.position[1])
+        col, row = self.position
         if self.target is not None:
             target_col, target_row = self.target
             ratio = self.progress / (Cell.CELL_SIZE * 2)

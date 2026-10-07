@@ -5,7 +5,7 @@ from pydantic import BaseModel, ValidationError, Field, ConfigDict
 import json
 
 class Score(BaseModel):
-    name: str = Field(pattern=r"^[A-Za-z0-9]+$")
+    name: str = Field(pattern=r"^[A-Za-z0-9 ]+$", max_length=10)
     score: int = Field(gt=0, lt=9999999999)
 
     model_config = ConfigDict(extra='forbid')

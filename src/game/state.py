@@ -108,7 +108,7 @@ class GameState:
                 g_col, g_row = ghost.position_px
                 difference = (abs(p_row - g_row), abs(p_col - g_col))
 
-                if difference[0] <= 30 and difference[1] <= 30:
+                if difference[0] <= 28 and difference[1] <= 28:
                     if ghost.behavior == GhostBehavior.FLEE:
                         self.player.add_score(
                             self.maze.config.points_per_ghost

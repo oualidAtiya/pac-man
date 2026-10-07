@@ -10,7 +10,7 @@ class Cell:
         self.content_position_px = None
         # self.gum_position = (0, 0)
         self.has_pacgum = False
-        self.has_super_pacgum=  False
+        self.has_super_pacgum = False
 
     def __repr__(self):
         return (

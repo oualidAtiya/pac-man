@@ -13,7 +13,8 @@ class Button:
 
     def __init__(self, name: str) -> None:
         """`name` is the button's asset prefix, e.g. 'start' loads
-        assets/start_normal.png, assets/start_hover.png, assets/start_pressed.png.
+        assets/start_normal.png, assets/start_hover.png,
+        assets/start_pressed.png.
         """
         self._images = {
             "normal": pygame.image.load(

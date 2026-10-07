@@ -1,13 +1,13 @@
-from argparse import ArgumentParser, ArgumentTypeError
-import re
-from typing import Any
-from src.config.models import GameConfig
-from src.config.logger import logger
 import json
+import re
+from argparse import ArgumentParser, ArgumentTypeError
+from typing import Any
+
+from src.config.logger import logger
+from src.config.models import GameConfig
 
 
 class Loader:
-
     def __init__(self) -> None:
         self.file_name = Loader.parse_file_name()
 
@@ -23,7 +23,7 @@ class Loader:
     @staticmethod
     def parse_file_name() -> str:
         parser = ArgumentParser()
-        parser.add_argument('file_name', type=Loader.json_type)
+        parser.add_argument("file_name", type=Loader.json_type)
         args = parser.parse_args()
         return args.file_name
 
@@ -36,7 +36,7 @@ class Loader:
         striped_content: list[str] = []
         for line in content:
             if not re.search(r"^\s*#", line):
-                striped_content += line.split('#')[0]
+                striped_content += line.split("#")[0]
         return "".join(striped_content)
 
     @staticmethod
@@ -77,13 +77,12 @@ class Loader:
             return GameConfig.model_validate(None)
         try:
             data = json.loads(
-                striped_content,
-                object_pairs_hook=Loader.check_duplicate
+                striped_content, object_pairs_hook=Loader.check_duplicate
             )
         except json.JSONDecodeError as err:
-            error_line = err.doc.split('\n')[err.lineno-1]
-            logger.json_error(error_line, self.file_name)
-            return GameConfig.model_validate(None)
+            error_line = err.doc.split("\n")[err.lineno - 1]
+            logger.json_error(error_line)
+            return None
 
         config = GameConfig.model_validate(data)
         return config

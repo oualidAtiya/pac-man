@@ -56,7 +56,7 @@ class Button:
                 state.screen = Screen.PLAYING
             case "high_scores":
                 state.screen = Screen.HIGH_SCORES
-                state.scores = IO().load()
+                state.scores = IO(state.maze.config.highscore_filename).load()
             case "instructions":
                 state.screen = Screen.INSTRUCTIONS
             case "resume":

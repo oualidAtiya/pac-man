@@ -2,7 +2,7 @@ from collections import deque
 
 import pygame
 from pygame import Surface
-
+from src.maze.generator_error import GeneratorError
 from src.config.models import GameConfig
 from src.game.direction import Direction
 from src.maze.adapter import MazeAdapter
@@ -10,7 +10,10 @@ from src.maze.adapter import MazeAdapter
 
 class Maze:
     def __init__(self, config: GameConfig) -> None:
-        self.grid = MazeAdapter(config).generate_maze()
+        try:
+            self.grid = MazeAdapter(config).generate_maze()
+        except Exception:
+            raise GeneratorError("Maze Generation Failed")
         self.config = config
         self.default = config.height, config.width
         self.width_maze_px = None
@@ -92,7 +95,10 @@ class Maze:
         else:
             self.config.height = self.default[0]
             self.config.width = self.default[1]
-        self.grid = MazeAdapter(self.config).generate_maze()
+        try:
+            self.grid = MazeAdapter(self.config).generate_maze()
+        except Exception:
+            raise GeneratorError("Maze Generation Failed")
         self.set_height_width_px()
         self.set_offests()
         self.set_cells_positions()

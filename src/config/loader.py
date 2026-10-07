@@ -52,7 +52,7 @@ class Loader:
             logger.warning(f"duplicated keys: {duplicated}")
         return dict(pairs)
 
-    def load_config(self) -> GameConfig | None:
+    def load_config(self) -> GameConfig:
         try:
             content = self.read_config_file()
         except PermissionError:
@@ -66,6 +66,9 @@ class Loader:
                 f"'{self.file_name}' file not "
                 "found default config will be used"
             )
+            return GameConfig.model_validate(None)
+        except IsADirectoryError:
+            logger.warning(f"{self.path} should be file not a directory")
             return GameConfig.model_validate(None)
 
         striped_content = Loader.strip_comments(content)

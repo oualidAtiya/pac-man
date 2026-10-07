@@ -1,3 +1,4 @@
+from src.config.logger import logger
 try:
     from mazegenerator import MazeGenerator
 except ImportError:

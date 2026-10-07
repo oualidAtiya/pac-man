@@ -31,4 +31,9 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except GeneratorError as e:
+        logger.error(e)
+    except Exception as e:
+        logger.error(e)

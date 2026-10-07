@@ -5,12 +5,22 @@ from pydantic import BaseModel, model_validator
 
 from src.config.logger import logger
 
+class Required(BaseModel):
+    lives: int = 3
+    seed: int = 42
+    super_gum_time: int = 10
+    level_max_time: int = 60
+    points_per_pacgum: int = 10
+    points_per_super_pacgum: int = 20
+    points_per_ghost: int = 30
+    highscore_filename: str = 'highscores.json'
 
 class GameConfig(BaseModel):
     width: int = 10
     height: int = 10
-    lives: int = 5
+    lives: int = 3
     seed: int = 42
+    super_gum_time: int = 10
     level_max_time: int = 60
     points_per_pacgum: int = 10
     points_per_super_pacgum: int = 20
@@ -29,7 +39,7 @@ class GameConfig(BaseModel):
             return {}
 
         data_copy = data.copy()
-        required_fields = cls.model_fields
+        required_fields = Required.model_fields
         missing_keys = set(required_fields.keys()).difference(data.keys())
         for key, value in data.items():
             if key not in required_fields.keys():

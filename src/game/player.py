@@ -1,10 +1,11 @@
 import pygame
 from pygame import Surface
-from src.game.state import GameState
+
 from src.game.direction import Direction
-from src.maze.maze import Maze
-from src.game.state import Screen
 from src.game.pacgum import PacgumType
+from src.game.state import GameState
+from src.maze.maze import Maze
+
 
 class Player:
     def __init__(self, maze: Maze) -> None:
@@ -14,7 +15,7 @@ class Player:
         self.position = None
         self.respawn_position = None
         self.current_direction = None
-        self.dead_position : None | tuple[int, int] = None
+        self.dead_position: None | tuple[int, int] = None
         self.next_direction: None | Direction = None
         self.target: None | tuple[int, int] = None
         self.score = 0
@@ -24,12 +25,20 @@ class Player:
         self.set_attr()
 
     def set_attr(self) -> None:
-        if (self.maze.config.height % 2 == 0):
-            self.start_cell = (self.maze.config.height // 2, self.maze.config.width // 2-1)
+        if self.maze.config.height % 2 == 0:
+            self.start_cell = (
+                self.maze.config.height // 2,
+                self.maze.config.width // 2 - 1,
+            )
         else:
-            self.start_cell = (self.maze.config.height // 2, self.maze.config.width // 2)
+            self.start_cell = (
+                self.maze.config.height // 2,
+                self.maze.config.width // 2,
+            )
         self.current_cell = self.start_cell
-        self.position = self.maze.grid[self.start_cell[0]][self.start_cell[1]].content_position_px
+        self.position = self.maze.grid[self.start_cell[0]][
+            self.start_cell[1]
+        ].content_position_px
         self.respawn_position = self.position
         self.dead_counter = 0
 
@@ -60,19 +69,24 @@ class Player:
                 return 2
             if 0 < self.dead_counter < 30:
                 return 3
-        
+
     def draw_die_state(self, screen: Surface):
         path = "assets/images/pac-man"
         frames = ["1.png", "2.png", "3.png", "4.png"]
         current_frame = self._get_current_frame(False)
-        screen.blit(pygame.image.load(f"{path}_dead/{frames[current_frame]}").convert_alpha(), (self.dead_position))
+        screen.blit(
+            pygame.image.load(
+                f"{path}_dead/{frames[current_frame]}"
+            ).convert_alpha(),
+            (self.dead_position),
+        )
 
     def draw(self, screen: Surface) -> None:
         path = "assets/images/pac-man"
-        if (self.dead_counter > 0):
+        if self.dead_counter > 0:
             self.draw_die_state(screen)
             return
-        
+
         frames = ["1.png", "2.png", "3.png"]
         x_px, y_px = self.position
         current_frame = self._get_current_frame(True)
@@ -121,8 +135,7 @@ class Player:
                 self.current_cell = self.target
                 self.target = None
                 self.acc = 0
-                if (self.next_direction
-                   and self._can_move(self.next_direction)):
+                if self.next_direction and self._can_move(self.next_direction):
                     self.request_move(self.next_direction)
                 elif self.current_direction and self._can_move(
                     self.current_direction
@@ -150,11 +163,17 @@ class Player:
                 return (y - 1, x)
             return None
         elif direction == Direction.EAST:
-            if 0 <= x + 1 <= self.maze.config.width - 1 and not self.maze.grid[y][x].east:
+            if (
+                0 <= x + 1 <= self.maze.config.width - 1
+                and not self.maze.grid[y][x].east
+            ):
                 return (y, x + 1)
             return None
         elif direction == Direction.WEST:
-            if 0 <= x - 1 <= self.maze.config.width - 1 and not self.maze.grid[y][x].west:
+            if (
+                0 <= x - 1 <= self.maze.config.width - 1
+                and not self.maze.grid[y][x].west
+            ):
                 return (y, x - 1)
             return None
 
@@ -175,7 +194,7 @@ class Player:
             cell.has_pacgum = False
             return PacgumType.NORMAL
         return None
-            
+
     def respawn(self) -> None:
         self.current_cell = self.start_cell
         self.position = self.respawn_position

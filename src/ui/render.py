@@ -39,7 +39,7 @@ class Renderer:
         self.hud = HUD()
 
     def _build_menu_buttons(self) -> dict[str, Button]:
-        """Create and position the main menu's buttons, keyed by action name."""
+        """Create and position the main menu's buttons."""
         names = ["start", "high_scores", "instructions", "exit"]
         spacing = 32
 

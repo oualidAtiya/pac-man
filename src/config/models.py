@@ -1,7 +1,9 @@
-from pydantic import (BaseModel, model_validator)
-from typing import Any
-from src.config.logger import logger
 import re
+from typing import Any
+
+from pydantic import BaseModel, model_validator
+
+from src.config.logger import logger
 
 
 class GameConfig(BaseModel):
@@ -13,17 +15,16 @@ class GameConfig(BaseModel):
     points_per_pacgum: int = 10
     points_per_super_pacgum: int = 20
     points_per_ghost: int = 30
-    highscore_filename: str = 'highscores.json'
+    highscore_filename: str = "highscores.json"
 
     @model_validator(mode="before")
     @classmethod
     def validate_fields(cls, data: Any):
-        if (data is None):
+        if data is None:
             return {}
-        if (not isinstance(data, dict)):
+        if not isinstance(data, dict):
             logger.warning(
-                "config file should be dict"
-                " default config will be used"
+                "config file should be dict default config will be used"
             )
             return {}
 
@@ -36,17 +37,19 @@ class GameConfig(BaseModel):
                 continue
 
             default = required_fields[key].default
-            if (key != 'highscore_filename'
-                    and (not isinstance(value, int) or value <= 0)):
+            if key != "highscore_filename" and (
+                not isinstance(value, int) or value <= 0
+            ):
                 logger.warning(
                     f"`{key}` should be positive"
                     f" int will be replaced by {default}"
                 )
                 data_copy[key] = default
                 continue
-            if key == 'highscore_filename':
-                if (not isinstance(value, str)
-                        or not re.search(r"^\S+\.json$", value)):
+            if key == "highscore_filename":
+                if not isinstance(value, str) or not re.search(
+                    r"^\S+\.json$", value
+                ):
                     logger.warning(
                         f"`{value}` should be valid json"
                         f" file will replaced by `{default}`"

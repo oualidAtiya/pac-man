@@ -2,8 +2,8 @@ try:
     from mazegenerator import MazeGenerator
 except ImportError:
     ...
-from src.maze.cell import Cell
 from src.config.models import GameConfig
+from src.maze.cell import Cell
 
 
 class MazeAdapter:
@@ -17,8 +17,8 @@ class MazeAdapter:
 
     def generate_maze(self) -> list[list[Cell]]:
         maze = MazeGenerator(
-            size=(self.width, self.height),
-            seed=self.seed).maze
+            size=(self.width, self.height), seed=self.seed
+        ).maze
         mapped_maze = []
         for row in maze:
             new_row = []

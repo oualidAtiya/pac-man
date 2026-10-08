@@ -1,5 +1,3 @@
-"""Owns the game window and the main loop."""
-
 import pygame
 
 from src.game.direction import Direction
@@ -13,12 +11,34 @@ from src.ui.utils import Rectangle
 
 
 class Renderer:
-    """Owns the game window and drives the main event loop."""
+    """Own the game window, run the main loop and draw every screen.
+
+    It reads the keyboard and mouse events, updates the game while it
+    is playing, and draws the screen that matches the current state.
+
+    Attributes:
+        background: The background image drawn on every frame.
+        fps: The maximum number of frames per second.
+        width: Width of the window in pixels.
+        height: Height of the window in pixels.
+        delta_time: Seconds elapsed during the last frame.
+        animation_time: Total seconds elapsed, used for animations.
+        current_frame: Frame counter used to count one second.
+        text_box: The text box used to type the player name.
+        hud: The heads-up display shown during the game.
+    """
 
     def __init__(
         self, width: int, height: int, fps: int = 60, title: str = "Pac-Man"
     ) -> None:
-        """Initialize pygame and open the window. Called once at startup."""
+        """Initialize pygame, open the window and build the UI.
+
+        Args:
+            width: Width of the window in pixels.
+            height: Height of the window in pixels.
+            fps: The maximum number of frames per second.
+            title: The title of the window.
+        """
         pygame.init()
         pygame.display.set_caption(title)
         self._screen = pygame.display.set_mode((width, height))
@@ -39,7 +59,11 @@ class Renderer:
         self.hud = HUD()
 
     def _build_menu_buttons(self) -> dict[str, Button]:
-        """Create and position the main menu's buttons."""
+        """Create the main menu buttons and center them vertically.
+
+        Returns:
+            The buttons of the main menu, indexed by their name.
+        """
         names = ["start", "high_scores", "instructions", "exit"]
         spacing = 32
 
@@ -56,6 +80,11 @@ class Renderer:
         return buttons
 
     def _build_pause_buttons(self) -> dict[str, Button]:
+        """Create the pause menu buttons and place them on screen.
+
+        Returns:
+            The buttons of the pause menu, indexed by their name.
+        """
         names = ["resume", "back"]
         spacing = 32
 
@@ -72,12 +101,26 @@ class Renderer:
         return buttons
 
     def handle_delay(self, state: GameState) -> None:
+        """Count frames and remove one second from the level timer.
+
+        Args:
+            state: The current game state, whose timer is updated.
+        """
         if state.time_remaining > 0 and self.current_frame == 60:
             state.time_remaining -= 1
             self.current_frame = 0
         self.current_frame += 1
 
     def check_time(self, state: GameState) -> None:
+        """Handle the end of the level timer.
+
+        When the time is over, the player loses a life. The game ends
+        if no life is left, otherwise the player and ghosts respawn
+        and the timer restarts.
+
+        Args:
+            state: The current game state.
+        """
         if state.player.is_time_out(state):
             if state.player.lose_life():
                 state.screen = Screen.GAME_OVER
@@ -90,9 +133,14 @@ class Renderer:
             state.time_remaining = state.maze.config.level_max_time
 
     def run(self, state: GameState) -> None:
-        """Run the main loop until a close condition is met.
+        """Run the main loop until the game is closed.
 
-        Blocks until the window is closed or Escape is pressed.
+        On each frame it checks the timer and the victory condition,
+        handles the events, updates the game while playing, and draws
+        the screen. Pygame is shut down when the loop ends.
+
+        Args:
+            state: The current game state.
         """
         self._running = True
         clock = pygame.time.Clock()
@@ -119,7 +167,11 @@ class Renderer:
         self._shutdown()
 
     def _handle_events(self, state: GameState) -> None:
-        """Poll pending events once per frame and react to them."""
+        """Read the pending pygame events and dispatch them.
+
+        Args:
+            state: The current game state.
+        """
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self._running = False
@@ -137,7 +189,21 @@ class Renderer:
     def _handle_keydown(
         self, key: int, event: pygame.event.Event, state: GameState
     ) -> None:
-        """Handle a single keypress. Extend this as gameplay is added."""
+        """React to a key press according to the current screen.
+
+        Escape quits from the menu, toggles the pause while playing and
+        goes back to the menu elsewhere. Enter starts a new game from
+        the menu. While playing, the arrow keys move the player and the
+        cheat keys are available: T adds 10 seconds, W wins the level,
+        C toggles ghost collisions and S makes ghosts edible. On the
+        victory and game over screens, the keys edit the player name
+        and Enter saves the score.
+
+        Args:
+            key: The pygame key code that was pressed.
+            event: The key event, used to read the typed character.
+            state: The current game state.
+        """
         if key == pygame.K_ESCAPE:
             if state.screen == Screen.MENU:
                 self._running = False
@@ -199,6 +265,14 @@ class Renderer:
     def _handle_mouse(
         self, state: GameState, event: pygame.event.Event
     ) -> None:
+        """Send a mouse event to the buttons of the visible menu.
+
+        Only the main menu and the pause menu have buttons.
+
+        Args:
+            state: The current game state.
+            event: The mouse event (motion, press or release).
+        """
         if state.screen == Screen.MENU:
             if event.type == pygame.MOUSEMOTION:
                 for button in self._menu_buttons.values():
@@ -226,7 +300,11 @@ class Renderer:
                     button.handle_mouse_up(state)
 
     def _draw(self, state: GameState) -> None:
-        """Render exactly one frame based on the current game state."""
+        """Draw one frame for the current screen and show it.
+
+        Args:
+            state: The current game state.
+        """
         self._screen.blit(self.background, (0, 0))
 
         match state.screen:
@@ -250,12 +328,22 @@ class Renderer:
         pygame.display.flip()
 
     def _draw_gameplay(self, state: GameState) -> None:
+        """Draw the maze, gums, HUD, player and ghosts.
+
+        Args:
+            state: The current game state.
+        """
         self._draw_maze_pacgum(state)
         self.hud.draw(self._screen, state)
         self._draw_player(state)
         self._draw_ghosts(state)
 
     def _draw_pause(self, state: GameState) -> None:
+        """Draw the pause panel and its buttons.
+
+        Args:
+            state: The current game state (not used here).
+        """
         pause = pygame.image.load("assets/images/screens/pause.png")
         width = 768
         height = 584
@@ -270,6 +358,14 @@ class Renderer:
             button.draw(self._screen)
 
     def _draw_high_scores(self, state: GameState) -> None:
+        """Draw the highscores panel with the top 10 names and scores.
+
+        Names and scores are drawn letter by letter with the images of
+        the text box font.
+
+        Args:
+            state: The current game state, which holds the scores.
+        """
         high_scores = pygame.image.load(
             "assets/images/screens/high_scores.png"
         )
@@ -311,6 +407,7 @@ class Renderer:
             score_y += 48
 
     def _draw_instructions(self) -> None:
+        """Draw the instructions panel with the controls and rules."""
         instructions = pygame.image.load(
             "assets/images/screens/instructions.png"
         )
@@ -323,23 +420,48 @@ class Renderer:
         self._screen.blit(instructions, position)
 
     def update(self, state: GameState) -> None:
+        """Move the player and the ghosts for one frame.
+
+        Args:
+            state: The current game state.
+        """
         state.player.update_position()
         for ghost in state.ghosts:
             ghost.move(state)
             ghost.update_position()
 
     def _draw_maze_pacgum(self, state: GameState) -> None:
+        """Draw the maze walls and the gums.
+
+        Args:
+            state: The current game state.
+        """
         state.maze.draw(self._screen)
         state.pacgum.draw(self._screen)
 
     def _draw_player(self, state: GameState) -> None:
+        """Draw the player.
+
+        Args:
+            state: The current game state.
+        """
         state.player.draw(self._screen)
 
     def _draw_ghosts(self, state: GameState) -> None:
+        """Draw all the ghosts.
+
+        Args:
+            state: The current game state.
+        """
         for ghost in state.ghosts:
             ghost.draw(self._screen, state, self.animation_time)
 
     def _draw_victory(self, state: GameState) -> None:
+        """Draw the victory panel, the final score and the name box.
+
+        Args:
+            state: The current game state.
+        """
         victory = pygame.image.load("assets/images/screens/victory.png")
         width = 1280
         height = 960
@@ -357,6 +479,11 @@ class Renderer:
         self.text_box.draw()
 
     def _draw_game_over(self, state: GameState) -> None:
+        """Draw the game over panel, the final score and the name box.
+
+        Args:
+            state: The current game state.
+        """
         game_over = pygame.image.load("assets/images/screens/game_over.png")
         width = 1280
         height = 960
@@ -381,6 +508,15 @@ class Renderer:
         screen_position: tuple[int, int],
         screen_rec: Rectangle,
     ) -> None:
+        """Draw the player's score, centered on a panel.
+
+        Each digit is drawn with the image of the text box font.
+
+        Args:
+            state: The current game state, which holds the score.
+            screen_position: The top-left (x, y) of the panel.
+            screen_rec: The rectangle giving the size of the panel.
+        """
         score = str(state.player.score)
         score_len = len(score) * 32
         x, y = (
@@ -393,11 +529,13 @@ class Renderer:
             x += 32
 
     def _draw_menu(self) -> None:
+        """Draw the main menu: the title and the buttons."""
         self._draw_title()
         for button in self._menu_buttons.values():
             button.draw(self._screen)
 
     def _draw_title(self) -> None:
+        """Draw the game title image at the top of the menu."""
         title = pygame.image.load("assets/images/title.png")
         width, height = 736, 112
         title_rect = Rectangle(0, 0, width, height)
@@ -406,5 +544,5 @@ class Renderer:
         self._screen.blit(title, tuple(title_rect))
 
     def _shutdown(self) -> None:
-        """Release pygame resources so no window or process is left hanging."""
+        """Close pygame so no window or process stays open."""
         pygame.quit()

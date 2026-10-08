@@ -5,7 +5,23 @@ from src.game.state import GameState
 
 
 class HUD:
+    """Draw the heads-up display shown during the game.
+
+    The images are loaded once at creation. The HUD shows the score,
+    the remaining lives, the remaining level time, the current level
+    and, while it is active, the super-pacgum timer.
+
+    Attributes:
+        digits: The digit images, indexed by the digit as a string.
+        level: The "level" label image.
+        live: The image of one life.
+        score: The "score" label image.
+        time: The "time" label image.
+        super_gum_time: The label image of the super-pacgum timer.
+    """
+
     def __init__(self) -> None:
+        """Load all the images used by the HUD."""
         self.digits = {
             str(i): pygame.image.load(
                 f"./assets/images/digits/{i}.png"
@@ -31,6 +47,13 @@ class HUD:
     def _draw_score(
         self, screen: Surface, score: int, corr: tuple[int, int]
     ) -> None:
+        """Draw the "score" label followed by the score value.
+
+        Args:
+            screen: The surface to draw on.
+            score: The score to display.
+            corr: The (x, y) pixel position of the label.
+        """
         x, y = corr
         screen.blit(self.score, (x, y))
         self._draw_number(screen, score, (x + 140, y))
@@ -38,6 +61,13 @@ class HUD:
     def _draw_number(
         self, screen: Surface, number: int, corr: tuple[int, int]
     ) -> None:
+        """Draw a number digit by digit using the digit images.
+
+        Args:
+            screen: The surface to draw on.
+            number: The number to display.
+            corr: The (x, y) pixel position of the first digit.
+        """
         x, y = corr
         number_str = str(number)
         for digit in number_str:
@@ -47,6 +77,13 @@ class HUD:
     def _draw_remain_time(
         self, screen: Surface, time: int, corr: tuple[int, int]
     ) -> None:
+        """Draw the "time" label followed by the remaining level time.
+
+        Args:
+            screen: The surface to draw on.
+            time: The remaining time in seconds.
+            corr: The (x, y) pixel position of the label.
+        """
         x, y = corr
         screen.blit(self.time, (x, y))
         self._draw_number(screen, time, (x + 120, y))
@@ -54,6 +91,13 @@ class HUD:
     def _draw_super_time(
         self, screen: Surface, time: int, corr: tuple[int, int]
     ) -> None:
+        """Draw the super-pacgum label followed by its remaining time.
+
+        Args:
+            screen: The surface to draw on.
+            time: The remaining super-pacgum time in seconds.
+            corr: The (x, y) pixel position of the label.
+        """
         x, y = corr
         screen.blit(self.super_gum_time, (x, y))
         self._draw_number(screen, int(time), (x + 230, y))
@@ -61,12 +105,30 @@ class HUD:
     def _draw_remain_lives(
         self, screen: Surface, lives: int, corr: tuple[int, int]
     ) -> None:
+        """Draw one life image for each remaining life.
+
+        Args:
+            screen: The surface to draw on.
+            lives: The number of remaining lives.
+            corr: The (x, y) pixel position of the first life.
+        """
         x, y = corr
         for _ in range(lives):
             screen.blit(self.live, (x, y))
             x += 40
 
     def draw(self, screen: Surface, state: GameState) -> None:
+        """Draw the whole HUD around the maze.
+
+        The score and the super-pacgum timer are drawn above the maze.
+        The lives, the level and the remaining time are drawn below it.
+        The super-pacgum timer is shown only while it is active.
+
+        Args:
+            screen: The surface to draw on.
+            state: The current game state, which holds the values to
+                display and the maze position.
+        """
         player = state.player
         maze = state.maze
         height_px, width_px = maze.height_maze_px, maze.width_maze_px
@@ -101,6 +163,13 @@ class HUD:
     def _draw_current_level(
         self, screen: Surface, level: int, corr: tuple[int, int]
     ) -> None:
+        """Draw the "level" label followed by the current level number.
+
+        Args:
+            screen: The surface to draw on.
+            level: The current level number.
+            corr: The (x, y) pixel position of the label.
+        """
         x, y = corr
         screen.blit(self.level, (x, y))
         self._draw_number(screen, level, (x + 140, y))

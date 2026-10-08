@@ -1,6 +1,8 @@
 import re
 from typing import Any
+
 from pydantic import BaseModel, model_validator
+
 from src.config.logger import logger
 
 
@@ -24,11 +26,11 @@ class Required(BaseModel):
     lives: int = 3
     seed: int = 42
     super_gum_time: int = 10
-    level_max_time: int = 60
+    level_max_time: int = 95
     points_per_pacgum: int = 10
     points_per_super_pacgum: int = 20
     points_per_ghost: int = 30
-    highscore_filename: str = 'highscores.json'
+    highscore_filename: str = "highscores.json"
 
 
 class GameConfig(BaseModel):
@@ -52,7 +54,7 @@ class GameConfig(BaseModel):
     lives: int = 3
     seed: int = 42
     super_gum_time: int = 10
-    level_max_time: int = 60
+    level_max_time: int = 95
     points_per_pacgum: int = 10
     points_per_super_pacgum: int = 20
     points_per_ghost: int = 30
@@ -90,7 +92,7 @@ class GameConfig(BaseModel):
         required_fields = Required.model_fields
         missing_keys = set(required_fields.keys()).difference(data.keys())
         for key, value in data.items():
-            if key not in required_fields.keys():
+            if key not in required_fields:
                 logger.warning(f"unknown key `{key}` will be ignored")
                 continue
 
@@ -104,6 +106,47 @@ class GameConfig(BaseModel):
                 )
                 data_copy[key] = default
                 continue
+
+            if key == "lives" and value > 5:
+                logger.warning(
+                    f"`{key}` should be between 1 and 5"
+                    f" will be replaced by {default}"
+                )
+                data_copy[key] = default
+                continue
+
+            if key in ("points_per_pacgum", "points_per_ghost") and value > 99:
+                logger.warning(
+                    f"`{key}` should be between 1 and 99"
+                    f" will be replaced by {default}"
+                )
+                data_copy[key] = default
+                continue
+
+            if key == "points_per_super_pacgum" and value > 999:
+                logger.warning(
+                    f"`{key}` should be between 1 and 999"
+                    f" will be replaced by {default}"
+                )
+                data_copy[key] = default
+                continue
+
+            if key == "super_gum_time" and value > 10:
+                logger.warning(
+                    f"`{key}` should be between 1 and 10"
+                    f" will be replaced by {default}"
+                )
+                data_copy[key] = default
+                continue
+
+            if key == "level_max_time" and value > 9999999:
+                logger.warning(
+                    f"`{key}` should be between 1 and 9999999"
+                    f" will be replaced by {default}"
+                )
+                data_copy[key] = default
+                continue
+
             if key == "highscore_filename":
                 if not isinstance(value, str) or not re.search(
                     r"^\S+\.json$", value
@@ -113,6 +156,8 @@ class GameConfig(BaseModel):
                         f" file will replaced by `{default}`"
                     )
                     data_copy[key] = default
+
         if missing_keys:
             logger.warning(f"missing keys: {missing_keys}")
+
         return data_copy

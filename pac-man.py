@@ -10,6 +10,13 @@ from src.ui.render import Renderer
 
 
 def main() -> None:
+    """Build the game objects and start the main loop.
+
+    The configuration is loaded, then the maze, the player, the four
+    ghosts (one in each corner) and the pacgums are created and
+    grouped in a game state. The window is opened and the game runs
+    until it is closed.
+    """
     loader = Loader()
     config = loader.load_config()
     maze = Maze(config)

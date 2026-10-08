@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING
 
 from src.game.ghost import Ghost, GhostBehavior
 from src.game.pacgum import Pacgum, PacgumType
-from src.game.score import Score
 from src.ui.text_box import TextBox
+from src.game.score import Score
 
 if TYPE_CHECKING:
     from src.game.player import Player
@@ -14,7 +14,18 @@ from src.maze.maze import Maze
 
 
 class Screen(Enum):
-    """Which screen/phase the game is currently in."""
+    """The screens or phases the game can be in.
+
+    Attributes:
+        MENU: The main menu.
+        PLAYING: A game is running.
+        PAUSED: The game is paused.
+        GAME_OVER: The player lost all lives.
+        VICTORY: The player completed all levels.
+        HIGH_SCORES: The highscores list is displayed.
+        INSTRUCTIONS: The controls and rules are displayed.
+        EXIT: The game must close.
+    """
 
     MENU = auto()
     PLAYING = auto()
@@ -27,8 +38,23 @@ class Screen(Enum):
 
 
 class GameState:
-    """Composition root: holds everything a frame needs to draw or
-    update, without owning any of their logic itself.
+    """Hold everything needed to update and draw a frame of the game.
+
+    It groups the maze, the player, the ghosts and the pacgums, and
+    contains the rules that link them together (eating gums, ghost
+    collisions, level changes).
+
+    Attributes:
+        screen: The screen or phase the game is currently in.
+        maze: The maze of the current level.
+        player: The player.
+        ghosts: The four ghosts.
+        pacgum: The gums of the current level.
+        level: The current level number, starting at 1.
+        time_remaining: Time left in the current level, in seconds.
+        super_pacgum_timer: Seconds left while ghosts are edible.
+        check_colission: Whether collisions with ghosts are checked.
+        scores: The list of highscores.
     """
 
     def __init__(
@@ -38,6 +64,14 @@ class GameState:
         ghosts: list[Ghost],
         pacgum: Pacgum,
     ) -> None:
+        """Create the game state, starting on the main menu.
+
+        Args:
+            maze: The maze of the first level.
+            player: The player.
+            ghosts: The four ghosts.
+            pacgum: The gums placed in the maze.
+        """
         self.screen = Screen.MENU
         self.maze = maze
         self.player = player
@@ -50,15 +84,32 @@ class GameState:
         self.scores: list[Score] = []
 
     def respawn_all_ghosts(self) -> None:
+        """Send every ghost back to its spawn cell."""
         for ghost in self.ghosts:
             ghost.respawn()
 
     def next_level(self) -> None:
+        """Move to the next level if the last one is not reached.
+
+        The level is rebuilt with a new maze, then the level number is
+        increased. Nothing happens when the level is already 10.
+        """
         if self.level < 10:
             self.reset(True)
             self.level += 1
 
     def reset(self, next_level: bool) -> None:
+        """Rebuild the maze, gums, player and ghosts.
+
+        When ``next_level`` is False, the game restarts from level 1
+        with a score of 0 and full lives. In both cases a new maze is
+        generated, the gums are placed again, the ghosts return to the
+        four corners in chase mode, and the timers are reset.
+
+        Args:
+            next_level: True when moving on to the next level, False
+                when starting a new game.
+        """
         if not next_level:
             self.level = 1
             self.player.score = 0
@@ -82,6 +133,20 @@ class GameState:
             ghost.set_behavior(GhostBehavior.CHASE)
 
     def update(self, delta_time: float, text_box: TextBox) -> None:
+        """Apply the game rules for one frame.
+
+        Handles, in order: eating the gum on the player's cell and
+        scoring it, going to the next level when no pacgum is left,
+        the super-pacgum timer (ghosts return to chase mode when it
+        ends), and collisions between the player and the ghosts. An
+        edible ghost that is touched gives points and respawns, any
+        other ghost makes the player lose a life, or ends the game
+        when no life is left.
+
+        Args:
+            delta_time: Time elapsed since the last frame, in seconds.
+            text_box: The name input box, reset when the game is over.
+        """
         eaten = self.player.eat_current_cell()
         if eaten == PacgumType.NORMAL:
             self.player.add_score(self.maze.config.points_per_pacgum)

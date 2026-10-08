@@ -420,7 +420,6 @@ Pydantic is used to validate:
 
 - [Pygame Documentation](https://www.pygame.org/docs/)
 - [Pygame Sprite and Surface Tutorials](https://www.pygame.org/docs/ref/surface.html)
-- [A-Maze-ing / maze-generation package documentation provided with the project](https://github.com/oualidAtiya/pac-man)
 
 ### AI Usage
 

@@ -4,6 +4,7 @@ import pygame
 from pygame.surface import Surface
 
 from src.ui.utils import Rectangle
+from src.config.paths import resource_path
 
 
 class TextBox:
@@ -32,9 +33,13 @@ class TextBox:
         Args:
             screen: The surface the text box is drawn on.
         """
-        self.image = pygame.image.load("assets/images/text_boxes/text_box.png")
+        self.image = pygame.image.load(
+            resource_path("assets/images/text_boxes/text_box.png")
+        )
         self.letters = {
-            letter: pygame.image.load(f"assets/images/letters/{letter}.png")
+            letter: pygame.image.load(
+                resource_path(f"assets/images/letters/{letter}.png")
+            )
             for letter in [*string.digits, *string.ascii_uppercase]
         }
         self.width = 576

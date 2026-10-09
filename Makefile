@@ -9,10 +9,13 @@ run:
 	--@$(MANAGER) $(PYTHON) pac-man.py $(ARG)
 
 debug:
-	@$(MANAGER) $(PYTHON) pdb pac-man.py
+	@$(MANAGER) $(PYTHON) -m pdb pac-man.py
 
 clean:
 	@find . -type d -name "__pycache__" -exec rm -rf {} +
+
+deploy:
+	@$(MANAGER) pyinstaller --onefile --name pac-man --add-data "assets:assets" pac-man.py
 
 lint:
 	@$(MANAGER) flake8 --exclude .venv .

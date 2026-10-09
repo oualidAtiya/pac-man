@@ -1,6 +1,6 @@
 from enum import Enum
 from random import shuffle
-
+from src.config.paths import resource_path
 import pygame
 from pygame import Surface
 
@@ -92,9 +92,11 @@ class Pacgum:
         Args:
             screen: The surface to draw on.
         """
-        gum = pygame.image.load("assets/images/gum.png").convert_alpha()
+        gum = pygame.image.load(
+            resource_path("assets/images/gum.png")
+        ).convert_alpha()
         super_gum = pygame.image.load(
-            "assets/images/super_gum.png"
+            resource_path("assets/images/super_gum.png")
         ).convert_alpha()
         for y, x in self.pac_gum_positions:
             cell = self.maze.grid[y][x]

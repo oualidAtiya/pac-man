@@ -2,6 +2,7 @@ import pygame
 from pygame import Surface
 
 from src.game.state import GameState
+from src.config.paths import resource_path
 
 
 class HUD:
@@ -24,24 +25,24 @@ class HUD:
         """Load all the images used by the HUD."""
         self.digits = {
             str(i): pygame.image.load(
-                f"./assets/images/digits/{i}.png"
+                resource_path(f"./assets/images/digits/{i}.png")
             ).convert_alpha()
             for i in range(10)
         }
         self.level = pygame.image.load(
-            "./assets/images/hud/level.png"
+            resource_path("./assets/images/hud/level.png")
         ).convert_alpha()
         self.live = pygame.image.load(
-            "./assets/images/hud/live.png"
+            resource_path("./assets/images/hud/live.png")
         ).convert_alpha()
         self.score = pygame.image.load(
-            "./assets/images/hud/score.png"
+            resource_path("./assets/images/hud/score.png")
         ).convert_alpha()
         self.time = pygame.image.load(
-            "./assets/images/hud/time.png"
+            resource_path("./assets/images/hud/time.png")
         ).convert_alpha()
         self.super_gum_time = pygame.image.load(
-            "./assets/images/hud/super_gum_time.png"
+            resource_path("./assets/images/hud/super_gum_time.png")
         ).convert_alpha()
 
     def _draw_score(

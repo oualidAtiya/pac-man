@@ -13,7 +13,7 @@ from pygame import Surface
 
 from src.game.direction import Direction
 from src.maze.cell import Cell
-
+from src.config.paths import resource_path
 _DELTA = {
     Direction.NORTH: (0, -1),
     Direction.SOUTH: (0, 1),
@@ -291,7 +291,7 @@ class Ghost:
                 animation frame.
         """
         sheet = pygame.image.load(
-            f"assets/images/ghosts/{self.color.value}_ghost.png"
+            resource_path(f"assets/images/ghosts/{self.color.value}_ghost.png")
         ).convert_alpha()
 
         scared_ghost_themes = [
@@ -305,7 +305,7 @@ class Ghost:
 
         if self.behavior == GhostBehavior.FLEE:
             sheet = pygame.image.load(
-                scared_ghost_themes[scared_frame]
+                resource_path(scared_ghost_themes[scared_frame])
             ).convert_alpha()
 
         col, row = float(self.position[0]), float(self.position[1])

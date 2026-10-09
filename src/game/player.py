@@ -5,6 +5,7 @@ from src.game.direction import Direction
 from src.game.pacgum import PacgumType
 from src.game.state import GameState
 from src.maze.maze import Maze
+from src.config.paths import resource_path
 
 
 class Player:
@@ -143,7 +144,7 @@ class Player:
         current_frame = self._get_current_frame(False)
         screen.blit(
             pygame.image.load(
-                f"{path}_dead/{frames[current_frame]}"
+                resource_path(f"{path}_dead/{frames[current_frame]}")
             ).convert_alpha(),
             (self.dead_position),
         )
@@ -168,28 +169,28 @@ class Player:
         if self.current_direction == Direction.SOUTH:
             screen.blit(
                 pygame.image.load(
-                    f"{path}_down/{frames[current_frame]}"
+                   resource_path(f"{path}_down/{frames[current_frame]}")
                 ).convert_alpha(),
                 (x_px, y_px),
             )
         elif self.current_direction == Direction.EAST:
             screen.blit(
                 pygame.image.load(
-                    f"{path}_right/{frames[current_frame]}"
+                    resource_path(f"{path}_right/{frames[current_frame]}")
                 ).convert_alpha(),
                 (x_px, y_px),
             )
         elif self.current_direction == Direction.NORTH:
             screen.blit(
                 pygame.image.load(
-                    f"{path}_up/{frames[current_frame]}"
+                    resource_path(f"{path}_up/{frames[current_frame]}")
                 ).convert_alpha(),
                 (x_px, y_px),
             )
         else:
             screen.blit(
                 pygame.image.load(
-                    f"{path}_left/{frames[current_frame]}"
+                   resource_path(f"{path}_left/{frames[current_frame]}")
                 ).convert_alpha(),
                 (x_px, y_px),
             )

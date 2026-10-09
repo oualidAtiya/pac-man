@@ -8,6 +8,7 @@ from src.ui.button import Button
 from src.ui.hud import HUD
 from src.ui.text_box import TextBox
 from src.ui.utils import Rectangle
+from src.config.paths import resource_path
 
 
 class Renderer:
@@ -43,7 +44,7 @@ class Renderer:
         pygame.display.set_caption(title)
         self._screen = pygame.display.set_mode((width, height))
         self.background = pygame.image.load(
-            "assets/images/background.png"
+            resource_path("assets/images/background.png")
         ).convert_alpha()
 
         self.fps = fps
@@ -344,7 +345,9 @@ class Renderer:
         Args:
             state: The current game state (not used here).
         """
-        pause = pygame.image.load("assets/images/screens/pause.png")
+        pause = pygame.image.load(
+            resource_path("assets/images/screens/pause.png")
+        )
         width = 768
         height = 584
         pause_rec = Rectangle(0, 0, width, height)
@@ -367,7 +370,7 @@ class Renderer:
             state: The current game state, which holds the scores.
         """
         high_scores = pygame.image.load(
-            "assets/images/screens/high_scores.png"
+            resource_path("assets/images/screens/high_scores.png")
         )
         width = 1280
         height = 960
@@ -409,7 +412,7 @@ class Renderer:
     def _draw_instructions(self) -> None:
         """Draw the instructions panel with the controls and rules."""
         instructions = pygame.image.load(
-            "assets/images/screens/instructions.png"
+            resource_path("assets/images/screens/instructions.png")
         )
         width, height = 1280, 960
         instructions_rect = Rectangle(0, 0, width, height)
@@ -462,7 +465,9 @@ class Renderer:
         Args:
             state: The current game state.
         """
-        victory = pygame.image.load("assets/images/screens/victory.png")
+        victory = pygame.image.load(
+            resource_path("assets/images/screens/victory.png")
+        )
         width = 1280
         height = 960
         victory_rect = Rectangle(0, 0, width, height)
@@ -484,7 +489,9 @@ class Renderer:
         Args:
             state: The current game state.
         """
-        game_over = pygame.image.load("assets/images/screens/game_over.png")
+        game_over = pygame.image.load(
+            resource_path("assets/images/screens/game_over.png")
+        )
         width = 1280
         height = 960
         game_over_rect = Rectangle(0, 0, width, height)
@@ -536,7 +543,7 @@ class Renderer:
 
     def _draw_title(self) -> None:
         """Draw the game title image at the top of the menu."""
-        title = pygame.image.load("assets/images/title.png")
+        title = pygame.image.load(resource_path("assets/images/title.png"))
         width, height = 736, 112
         title_rect = Rectangle(0, 0, width, height)
         title_rect.centerx = self.width // 2

@@ -4,6 +4,7 @@ from pygame.surface import Surface
 from src.game.score import IO
 from src.game.state import GameState, Screen
 from src.ui.utils import Rectangle
+from src.config.paths import resource_path
 
 
 class Button:
@@ -36,13 +37,13 @@ class Button:
         """
         self._images = {
             "normal": pygame.image.load(
-                f"assets/images/buttons/{name}_normal.png"
+                resource_path(f"assets/images/buttons/{name}_normal.png")
             ).convert_alpha(),
             "hover": pygame.image.load(
-                f"assets/images/buttons/{name}_hover.png"
+                resource_path(f"assets/images/buttons/{name}_hover.png")
             ).convert_alpha(),
             "pressed": pygame.image.load(
-                f"assets/images/buttons/{name}_pressed.png"
+                resource_path(f"assets/images/buttons/{name}_pressed.png")
             ).convert_alpha(),
         }
         self.width = 448

@@ -1,11 +1,11 @@
 from collections import deque
-
 import pygame
 from pygame import Surface
 from src.maze.generator_error import GeneratorError
 from src.config.models import GameConfig
 from src.game.direction import Direction
 from src.maze.adapter import MazeAdapter
+from src.config.paths import resource_path
 
 
 class Maze:
@@ -193,7 +193,7 @@ class Maze:
         """
         corners = {
             i: pygame.image.load(
-                f"assets/images/corners/{i}x32.png"
+                resource_path(f"assets/images/corners/{i}x32.png")
             ).convert_alpha()
             for i in range(1, 17)
         }

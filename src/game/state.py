@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING
 
 from src.game.ghost import Ghost, GhostBehavior
 from src.game.pacgum import Pacgum, PacgumType
-from src.ui.text_box import TextBox
 from src.game.score import Score
+from src.ui.text_box import TextBox
 
 if TYPE_CHECKING:
     from src.game.player import Player
@@ -180,6 +180,7 @@ class GameState:
                             self.maze.config.points_per_ghost
                         )
                         ghost.respawn()
+                        ghost.delay_time = 2.0
                     else:
                         if self.player.lose_life():
                             self.screen = Screen.GAME_OVER

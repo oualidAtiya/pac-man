@@ -1,5 +1,6 @@
 import pygame
 
+from src.config.paths import resource_path
 from src.game.direction import Direction
 from src.game.ghost import GhostBehavior
 from src.game.score import IO, Score
@@ -8,7 +9,6 @@ from src.ui.button import Button
 from src.ui.hud import HUD
 from src.ui.text_box import TextBox
 from src.ui.utils import Rectangle
-from src.config.paths import resource_path
 
 
 class Renderer:
@@ -457,7 +457,9 @@ class Renderer:
             state: The current game state.
         """
         for ghost in state.ghosts:
-            ghost.draw(self._screen, state, self.animation_time)
+            ghost.delay_time -= self.delta_time
+            if ghost.delay_time <= 0:
+                ghost.draw(self._screen, state, self.animation_time)
 
     def _draw_victory(self, state: GameState) -> None:
         """Draw the victory panel, the final score and the name box.

@@ -11,9 +11,10 @@ from enum import Enum, auto
 import pygame
 from pygame import Surface
 
+from src.config.paths import resource_path
 from src.game.direction import Direction
 from src.maze.cell import Cell
-from src.config.paths import resource_path
+
 _DELTA = {
     Direction.NORTH: (0, -1),
     Direction.SOUTH: (0, 1),
@@ -101,6 +102,7 @@ class Ghost:
         self.target: tuple[int, int] | None = None
         self.progress = 0
         self.speed = 2
+        self.delay_time = 0.0
 
     def set_position(self, position: tuple[int, int]) -> None:
         """Place the ghost on a cell and set it as its spawn cell.
@@ -108,7 +110,7 @@ class Ghost:
         Args:
             position: The (column, row) cell to place the ghost on.
         """
-        self.position_px = (0, 0)
+        self.position_px = (0.0, 0.0)
         self.position = position
         self.spawn_position = position
 
@@ -131,7 +133,7 @@ class Ghost:
         Args:
             state: The current game state.
         """
-        if self.target is not None:
+        if self.target is not None or self.delay_time > 0:
             return
 
         uses_random_movement = self._uses_random_movement(state.level)
@@ -173,7 +175,9 @@ class Ghost:
 
     def respawn(self) -> None:
         """Send the ghost back to its spawn cell and cancel its move."""
+        self.behavior = GhostBehavior.CHASE
         self.position = self.spawn_position
+        self.position_px = (0.0, 0.0)
         self.target = None
 
     def _uses_random_movement(self, level: int) -> bool:

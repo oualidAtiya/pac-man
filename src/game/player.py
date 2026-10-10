@@ -1,11 +1,11 @@
 import pygame
 from pygame import Surface
 
+from src.config.paths import resource_path
 from src.game.direction import Direction
 from src.game.pacgum import PacgumType
 from src.game.state import GameState
 from src.maze.maze import Maze
-from src.config.paths import resource_path
 
 
 class Player:
@@ -169,7 +169,7 @@ class Player:
         if self.current_direction == Direction.SOUTH:
             screen.blit(
                 pygame.image.load(
-                   resource_path(f"{path}_down/{frames[current_frame]}")
+                    resource_path(f"{path}_down/{frames[current_frame]}")
                 ).convert_alpha(),
                 (x_px, y_px),
             )
@@ -190,7 +190,7 @@ class Player:
         else:
             screen.blit(
                 pygame.image.load(
-                   resource_path(f"{path}_left/{frames[current_frame]}")
+                    resource_path(f"{path}_left/{frames[current_frame]}")
                 ).convert_alpha(),
                 (x_px, y_px),
             )

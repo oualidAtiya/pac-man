@@ -20,6 +20,12 @@ The goal is to create a playable game with:
 
 The game is implemented in Python and uses Pygame for graphics and input handling. The project also uses a local version of the `mazegenerator` package to generate mazes.
 
+## Play the Game
+
+You can dowload and play the packaged version of the game on itch.io:
+[Play Pac-Man](https://oualidatiya.itch.io/pac-man)
+
+
 ## Features
 
 - Main menu with Start, Highscores, Instructions, and Exit options

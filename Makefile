@@ -12,7 +12,8 @@ debug:
 	@$(MANAGER) $(PYTHON) -m pdb pac-man.py
 
 clean:
-	@find . -type d -name "__pycache__" -exec rm -rf {} +
+	@find . -type d -name __pycache__ -exec rm -rf {} +
+	@find . -type d -name .mypy_cache -exec rm -rf {} +
 
 deploy:
 	@$(MANAGER) pyinstaller --onefile --name pac-man --add-data "assets:assets" pac-man.py
